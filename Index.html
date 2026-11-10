@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<!--
+  Driver Update Sheet
+  Designed & developed by: (your name is set in DEVELOPER near the top of the script below)
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Driver Update Sheet</title>
+<style>
+:root{
+  --bg:#eef0fb;--card:#fff;--ink:#1d1b36;--muted:#6c6a8a;--line:#e3e1f2;--mine:#eefaf3;--warn:#fff4d6;--warnink:#7a5200;
+  --shadow:0 10px 30px rgba(60,50,140,.12);--cur:#475569;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#12111c;--card:#1c1a2b;--ink:#eeecfa;--muted:#9d9abb;--line:#2e2b44;--mine:#173028;--warn:#3a2f10;--warnink:#f5d98a;--shadow:0 10px 30px rgba(0,0,0,.45);
+}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif;padding:14px 10px 30px;
+  background:radial-gradient(900px 400px at 10% -10%,rgba(109,93,252,.22),transparent 60%),radial-gradient(800px 400px at 100% 0,rgba(236,72,153,.16),transparent 60%),var(--bg)}
+.shell{max-width:1600px;margin:0 auto}
+@media (min-width:761px){body{padding:22px clamp(20px,5vw,90px) 40px}}
+header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:20px;animation:drop .6s cubic-bezier(.2,.8,.2,1) both}
+.hright{justify-self:end;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.hperson{justify-self:center;display:flex;align-items:center;gap:12px;background:var(--card);padding:6px 20px 6px 8px;border-radius:99px;box-shadow:var(--shadow);animation:pop .4s both}
+.hperson[hidden]{display:none}
+.hperson .av{width:52px;height:52px;font-size:18px}
+.hperson .who{text-align:left}
+h1{margin:0;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;font-weight:800}
+.date{color:var(--muted);font-weight:600}
+.status{display:inline-flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-size:13px;font-weight:600}
+.status i{width:8px;height:8px;border-radius:50%;background:#f59e0b}
+.status.ok i{background:#22c55e;animation:pulse 1.8s infinite}
+.status.bad i{background:#ef4444}
+.status button{font:inherit;font-size:12px;font-weight:700;cursor:pointer;border:0;border-radius:99px;padding:4px 12px;background:var(--cur);color:#fff;transition:transform .2s}
+.status button:hover{transform:scale(1.06)}
+.lo{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:99px;padding:8px 18px;background:#ef4444;color:#fff;box-shadow:var(--shadow);transition:transform .2s;animation:pop .35s both}
+.lo.in{background:#6d5dfc}
+.lo:hover{transform:scale(1.06)}.lo[hidden]{display:none}
+.status button.spin{animation:spin .8s linear infinite}
+
+.toast{position:fixed;right:18px;bottom:18px;z-index:20;max-width:min(92vw,420px);background:#1d1b36;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;transform:translateY(12px);transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:none}.toast.err{background:#dc2626}
+.warn{background:var(--warn);color:var(--warnink);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:13.5px;display:none}
+.warn small{opacity:.85}
+.warn.show{display:block;animation:drop .4s both}
+
+/* main group cards */
+.mains{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:12px}
+.mbtn{--c:#6d5dfc;position:relative;overflow:hidden;text-align:left;font:inherit;color:var(--ink);cursor:pointer;
+  border:1.5px solid var(--line);background:var(--card);border-radius:20px;padding:18px 20px 18px 24px;box-shadow:var(--shadow);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .25s;
+  opacity:0;animation:rise .55s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--n)*80ms + 120ms)}
+.mbtn::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c)}
+.mbtn::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#000));
+  clip-path:circle(0% at 100% 0);transition:clip-path .5s cubic-bezier(.2,.8,.2,1)}
+.mbtn>*{position:relative;z-index:1;transition:color .3s}
+.mbtn:hover{transform:translateY(-4px);border-color:var(--c)}
+.mbtn:active{transform:scale(.98)}
+.mbtn.on{border-color:transparent;transform:translateY(-4px);box-shadow:0 16px 34px color-mix(in srgb,var(--c) 45%,transparent)}
+.mbtn.on::after{clip-path:circle(150% at 100% 0)}
+.mbtn.on>*{color:#fff}
+.mbtn:focus-visible,.chip:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.mrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mname{font-weight:800;font-size:19px}
+.mcount{font-size:30px;font-weight:800;line-height:1}
+.msub{display:block;margin-top:4px;font-size:12.5px;color:var(--muted)}
+
+/* sub group chips */
+.subs{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.2,.8,.2,1);margin-bottom:0}
+.subs.open{grid-template-rows:1fr;margin-bottom:12px}
+.subs>div{overflow:hidden;min-height:0}
+.chips{display:flex;flex-wrap:wrap;gap:10px;padding:4px 2px 6px}
+.chip{--c:#6d5dfc;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:10px;padding:9px 16px;border-radius:99px;
+  border:1.5px solid var(--c);background:var(--card);color:var(--ink);font-weight:700;
+  transition:transform .2s,background .25s,color .25s,box-shadow .25s;animation:pop .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--n)*60ms)}
+.chip:hover{transform:translateY(-2px);box-shadow:0 8px 18px color-mix(in srgb,var(--c) 30%,transparent)}
+.chip.on{background:var(--c);color:#fff;box-shadow:0 8px 18px color-mix(in srgb,var(--c) 40%,transparent)}
+.chip small{font-weight:600;opacity:.8}
+.chip b{background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);padding:0 9px;border-radius:99px;font-size:13px}
+.chip.on b{background:rgba(255,255,255,.25);color:#fff}
+
+/* info + search */
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;animation:drop .6s .3s both}
+.info{flex:1 1 360px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;background:var(--card);border-radius:14px;padding:11px 16px;box-shadow:var(--shadow);border-left:5px solid var(--cur);transition:border-color .3s}
+.info b{color:var(--cur)}
+.pill{margin-left:auto;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;background:var(--line);color:var(--muted)}
+.pill.edit{background:#22c55e;color:#fff}
+.grow{flex:1 1 220px}
+.meta{display:flex;align-items:center;gap:10px}
+.av{width:44px;height:44px;border-radius:50%;background:var(--cur);color:#fff;display:grid;place-items:center;font-weight:800;overflow:hidden;flex:none;animation:pop .4s both}
+.av img{width:100%;height:100%;object-fit:cover}
+.who{display:flex;flex-direction:column;line-height:1.25}.who small{color:var(--muted)}
+.pinbox{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pinbox.shake{animation:shake .4s}
+.pininp{font:inherit;width:130px;padding:6px 14px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.pininp:focus{outline:none;border-color:var(--cur)}
+.ubtn{font:inherit;font-weight:700;border:0;border-radius:99px;padding:7px 18px;background:var(--cur);color:#fff;cursor:pointer;transition:transform .2s}
+.ubtn:hover{transform:scale(1.05)}.ubtn.red{background:#ef4444}
+.pinmsg{color:#ef4444;font-weight:700;font-size:13px}.pinmsg:empty{display:none}
+.search{flex:0 1 280px;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 16px;box-shadow:var(--shadow);transition:border-color .2s}
+.search:focus{outline:none;border-color:var(--cur)}
+
+/* table */
+.wrap{overflow:auto;max-height:calc(100vh - 110px);min-height:260px;background:var(--card);border-radius:18px;box-shadow:var(--shadow);animation:drop .6s .4s both}
+table{border-collapse:collapse;width:100%}
+th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.08);background:linear-gradient(135deg,#5b4bd8,#8b5cf6);color:#fff;padding:10px 6px;font-size:12.5px;font-weight:700;text-align:center}
+td{padding:7px 6px;text-align:center;border-top:1px solid var(--line);font-size:14px;overflow-wrap:anywhere}
+td:nth-child(2){white-space:nowrap;overflow-wrap:normal}
+td.l{text-align:left}
+tbody tr{animation:rowIn .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*26ms);transition:background .2s}
+tbody tr:hover td{background:color-mix(in srgb,var(--cur) 8%,transparent)}
+tr.mine td{background:var(--mine)}
+.st{display:inline-block;padding:2px 11px;border-radius:99px;font-size:12.5px;font-weight:700;white-space:nowrap;background:hsl(var(--h) 70% 45%/.16);color:hsl(var(--h) 65% 36%)}
+@media (prefers-color-scheme:dark){.st{color:hsl(var(--h) 85% 74%)}}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;color:#fff;font-size:12px;font-weight:700}
+td input{font:inherit;width:100%;min-width:90px;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:5px 9px;transition:border-color .2s,box-shadow .2s,background .3s}
+td input:focus{outline:none;border-color:var(--cur);box-shadow:0 0 0 3px color-mix(in srgb,var(--cur) 25%,transparent)}
+td input[data-f=phone]{min-width:122px}td input[data-f=vendor]{min-width:84px}
+td input.miss{border-color:#ef4444}
+td input.hit{animation:flash .9s}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.shimmer{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--line),transparent,var(--line));background-size:200% 100%;animation:sh 1.2s infinite}
+.note{color:var(--muted);font-size:12.5px;margin-top:14px}
+
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%,100%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sh{to{background-position:-200% 0}}
+@keyframes flash{0%{background:rgba(34,197,94,.45)}100%{background:var(--card)}}
+body:not(.landing) .total{display:none}
+.total{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:30px;cursor:pointer;position:relative;overflow:hidden;
+  background:color-mix(in srgb,var(--card) 80%,transparent);backdrop-filter:blur(14px);border:1.5px solid var(--line);
+  border-radius:28px;padding:24px 34px;margin-bottom:18px;box-shadow:var(--shadow);animation:rise .7s cubic-bezier(.2,.8,.2,1) both;transition:transform .3s,box-shadow .3s}
+.total:hover{transform:translateY(-3px);box-shadow:0 22px 50px rgba(80,60,200,.28)}
+.total::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,transparent 0 60%,rgba(109,93,252,.22) 80%,transparent);animation:spin 10s linear infinite;pointer-events:none}
+.total>*{position:relative}
+.total:focus-visible{outline:3px solid #6d5dfc;outline-offset:3px}
+.donut{position:relative;width:172px;height:172px}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut .trk{fill:none;stroke:var(--line);stroke-width:12}
+.donut .seg{fill:none;stroke-width:12;stroke-dasharray:0 400;transition:stroke-dasharray 1.4s cubic-bezier(.2,.8,.2,1),stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+.dc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.dc b{font-size:46px;font-weight:800;letter-spacing:-.03em}
+.dc small{margin-top:4px;color:var(--muted);font-weight:600;font-size:13px}
+.tinfo{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.tlabel{font-size:14px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;font-weight:600;font-size:16px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px}
+.legend b{margin-left:6px}
+.tgo{padding:9px 20px;border-radius:99px;background:linear-gradient(135deg,#6d5dfc,#ec4899);color:#fff;font-weight:700;transition:transform .25s,box-shadow .25s}
+.total:hover .tgo{transform:translateX(6px);box-shadow:0 8px 20px rgba(236,72,153,.4)}
+.blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.blobs span{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(70px);opacity:.34;animation:drift 22s ease-in-out infinite alternate}
+.blobs span:nth-child(1){background:#6d5dfc;left:-12vmax;top:-14vmax}
+.blobs span:nth-child(2){background:#ec4899;right:-14vmax;top:6vmax;animation-duration:27s;animation-delay:-6s}
+.blobs span:nth-child(3){background:#06b6d4;left:24vmax;bottom:-24vmax;animation-duration:31s;animation-delay:-12s}
+@media (prefers-color-scheme:dark){.blobs span{opacity:.2}}
+@keyframes drift{to{transform:translate(8vmax,6vmax) scale(1.15)}}
+@keyframes gmove{to{background-position:300% 0}}
+h1{background:linear-gradient(90deg,#6366f1,#ec4899,#06b6d4,#6366f1);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gmove 9s linear infinite;cursor:pointer;width:fit-content}
+/* landing cards */
+.micon,.mbar,.mgo{display:none}
+.mglow{position:absolute!important;inset:0;z-index:0!important;opacity:0;transition:opacity .3s;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--c) 24%,transparent),transparent 70%);pointer-events:none}
+.mbtn:hover .mglow{opacity:1}
+.landing .mains{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.landing .mbtn{padding:24px 24px 22px 30px;border-radius:26px;min-height:215px;display:flex;flex-direction:column;transform-style:preserve-3d;will-change:transform}
+.landing .mbtn:hover{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-6px)}
+.landing .micon{display:grid;place-items:center;width:54px;height:54px;border-radius:17px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);margin-bottom:14px;transition:transform .4s}
+.landing .micon svg{width:29px;height:29px}
+.landing .mbtn:hover .micon{transform:rotate(-8deg) scale(1.12)}
+.landing .mname{font-size:21px}.landing .mcount{font-size:48px}
+.landing .msub{margin-top:6px;font-size:13.5px}
+.landing .mbar{display:block;height:6px;border-radius:99px;background:var(--line);margin-top:auto;overflow:hidden}
+.landing .mbar i{display:block;height:100%;width:0;background:var(--c);border-radius:99px;transition:width 1.3s cubic-bezier(.2,.8,.2,1)}
+.landing .mgo{display:block;margin-top:12px;font-weight:700;color:var(--c)}
+.landing .mgo em{display:inline-block;font-style:normal;transition:transform .25s}
+.landing .mbtn:hover .mgo em{transform:translateX(6px)}
+/* vehicle being edited */
+tr.editing-row td{background:color-mix(in srgb,var(--g,var(--cur)) 13%,transparent)!important}
+tr.editing-row td:first-child{box-shadow:inset 4px 0 0 var(--g,var(--cur))}
+.ract{display:flex;gap:6px;margin-top:6px;justify-content:center;flex-wrap:wrap}
+.ract button{font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:8px;padding:4px 10px;cursor:pointer;color:#fff;background:#16a34a;transition:transform .2s}
+.ract button.no{background:#64748b}.ract button:hover{transform:scale(1.06)}
+/* click-to-edit cells */
+td.ec{cursor:pointer;position:relative;transition:background .2s,box-shadow .2s;border-radius:6px}
+td.ec:hover{background:color-mix(in srgb,var(--cur) 13%,transparent)!important;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--cur) 55%,transparent)}
+td.ec::after{content:"✎";font-size:.8em;margin-left:6px;opacity:0;transition:opacity .2s;color:var(--cur)}
+td.ec:hover::after,td.ec:focus-visible::after{opacity:.95}
+td.ec:focus-visible{outline:2px solid var(--cur);outline-offset:-2px}
+td.ec.editing{background:transparent!important;box-shadow:none}td.ec.editing::after{display:none}
+.dash{color:var(--muted)}
+@media (hover:none){td.ec::after{opacity:.55}}
+.ubtn.ghost{background:var(--line);color:var(--ink)}
+.landing .bar,.landing .wrap,.landing .subs{display:none}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(10,8,25,.55);backdrop-filter:blur(4px);display:grid;place-items:center;padding:16px;animation:fade .25s both}
+.modal[hidden]{display:none}
+.mcard{position:relative;width:min(92vw,380px);background:var(--card);border-radius:22px;padding:28px 24px 22px;box-shadow:0 24px 60px rgba(0,0,0,.4);animation:pop .3s cubic-bezier(.2,.8,.2,1) both;text-align:center}
+.mcard.shake{animation:shake .4s}
+.mcard h2{margin:0 0 4px;font-size:22px}.mcard p{margin:0 0 16px;color:var(--muted);min-height:1.2em}
+.pinbig{width:100%;font:inherit;font-size:22px;letter-spacing:.3em;text-align:center;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.pinbig:focus{outline:none;border-color:#6d5dfc}
+.mrow2{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.mcard .ubtn{background:#6d5dfc;padding:10px 28px}
+.mx{position:absolute;top:8px;right:12px;border:0;background:none;color:var(--muted);font-size:28px;cursor:pointer;line-height:1}
+.linkbtn{margin-top:14px;border:0;background:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:13.5px;cursor:pointer}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.avwrap{position:relative;cursor:pointer;display:block;flex:none}
+.avwrap::after{content:"✎";position:absolute;right:-3px;bottom:-3px;width:20px;height:20px;border-radius:50%;background:var(--card);color:var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.35);display:grid;place-items:center;font-size:12px}
+.avwrap:hover .av{filter:brightness(1.1)}
+.vcat,.vbag{display:none}
+/* phone layout: every vehicle becomes a large, easy-to-read card */
+@media (max-width:760px){
+  body{padding:10px 8px 28px;font-size:20px}
+  header{align-items:center;margin-bottom:12px}
+  h1{font-size:30px}.date{font-size:17px}
+  .status{font-size:17px}.status button{font-size:16px;padding:8px 16px}
+  .mains{grid-template-columns:repeat(3,1fr);gap:8px}
+  .mbtn{padding:12px 10px 12px 15px;border-radius:14px}
+  .mbtn::before{width:4px}
+  .mrow{flex-direction:column;align-items:flex-start;gap:2px}
+  .mname{font-size:18px;line-height:1.2}.mcount{font-size:32px}.msub{display:none}
+  .chip{padding:12px 20px;font-size:19px}.chip small{display:none}.chip b{font-size:17px}
+  .info{flex-basis:100%;font-size:19px;padding:14px 16px}
+  .info small{font-size:15px}
+  .pill{font-size:16px;padding:5px 14px}
+  .pininp{font-size:20px;width:170px;padding:11px 18px}.ubtn{font-size:19px;padding:12px 24px}.pinmsg{font-size:17px}
+  .av{width:58px;height:58px;font-size:21px}
+  .search{flex:1 1 100%;font-size:19px;padding:15px 18px}
+  .wrap{max-height:none;overflow:visible;background:transparent;box-shadow:none;min-height:0}
+  table,tbody{display:block}
+  thead{display:none}
+  tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 14px;position:relative;margin-top:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);margin-bottom:12px;padding:20px 14px 16px 16px;border-left:6px solid var(--g,var(--cur))}
+  tr.mine{background:var(--mine)}
+  tr.mine td,tbody tr:hover td{background:transparent}
+  td{display:block;border:0;padding:0;text-align:left;font-size:21px;line-height:1.3;overflow-wrap:anywhere;min-width:0}
+  td+td{border-top:0}
+  td::before{content:attr(data-l);display:block;font-weight:600;color:var(--muted);font-size:15px;margin-bottom:3px;letter-spacing:.02em}
+  td:first-child{display:none}
+  td.l{text-align:left}
+  /* card:  [Vehicle  OT ........ 100 bag]  [Driver name]  [Location | Sub Location]  [Capacity | Phone]  [Code | Vendor] */
+  td[data-l="Category"],td[data-l="Bag"]{display:none}
+  td[data-l="Vehicle No."]{order:1;grid-column:1/-1;display:flex;align-items:baseline;gap:10px;font-size:28px;font-weight:800}
+  td[data-l="Vehicle No."]::before{display:none}
+  .vcat{display:inline-block;font-size:18px;font-weight:700;padding:1px 10px;border-radius:8px;background:color-mix(in srgb,var(--g,var(--cur)) 22%,transparent);color:var(--ink);line-height:1.4}
+  .vbag{display:inline-block;margin-left:auto;font-size:16px;font-weight:600;color:var(--muted)}
+  td[data-l="Driver Name"]{order:2;grid-column:1/-1;font-size:22px;font-weight:700;line-height:1.25}
+  td[data-l="Location"]{order:3}
+  td[data-l="Sub Location"]{order:4}
+  td[data-l="Capacity"]{order:5}
+  td[data-l="Phone Number"]{order:6;font-weight:600}
+  td[data-l="Code No"]{order:7;font-weight:600}
+  td[data-l="Vendor Code"]{order:8;font-weight:600}
+  td[data-l="Status"]{order:10;grid-column:1/-1}
+  td[data-l="Status"] .st{font-size:17px;padding:4px 14px}
+  td[data-l="Location"],td[data-l="Sub Location"],td[data-l="Capacity"],td[data-l="Phone Number"],td[data-l="Code No"],td[data-l="Vendor Code"]{font-size:20px}
+  /* group name = small badge on the top edge of the card */
+  td[data-l="Group"]{order:9;position:absolute;top:-11px;right:14px;padding:0}
+  td[data-l="Group"]::before{display:none}
+  td[data-l="Group"] .tag{font-size:14px;padding:3px 12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  td input{width:100%;min-width:0;text-align:left;font-size:19px;padding:11px 10px;border-radius:12px}
+  .avwrap::after{width:24px;height:24px;font-size:14px}
+  td input[data-f=phone],td input[data-f=vendor]{min-width:0}
+  .toast{left:10px;right:10px;bottom:10px;max-width:none;text-align:center;font-size:18px}
+  header{grid-template-columns:1fr;justify-items:stretch;gap:10px}
+  .hperson{justify-self:center;padding:8px 22px 8px 10px}
+  .hperson .av{width:60px;height:60px;font-size:22px}
+  .hperson .who b{font-size:20px}.hperson .who small{font-size:16px}
+  .hright{justify-self:stretch;justify-content:space-between}
+  .lo{font-size:17px;padding:9px 20px}
+  .total{grid-template-columns:auto 1fr;gap:16px;padding:16px}
+  .donut{width:122px;height:122px}.dc b{font-size:34px}.dc small{font-size:12px}
+  .tlabel{font-size:13px}.legend{font-size:16px;gap:6px 14px}.tgo{font-size:17px;padding:8px 16px}
+  .landing .mains{grid-template-columns:1fr;gap:12px}
+  .landing .mbtn{min-height:0;padding:18px 18px 16px 22px}
+  .landing .mrow{flex-direction:row;align-items:center}
+  .landing .mname{font-size:23px}.landing .mcount{font-size:38px}.landing .msub{display:block;font-size:15px}
+  .landing .micon{width:46px;height:46px;margin-bottom:10px}.landing .mgo{font-size:17px}
+  td.ec{min-height:50px}td.ec::after{opacity:.6;font-size:.9em}
+  .ract{justify-content:flex-start;gap:8px;margin-top:10px}.ract button{font-size:17px;padding:10px 16px;border-radius:10px}
+  tr.editing-row{outline:2px solid var(--g,var(--cur))}
+  td.ec.editing input{margin-top:2px}
+  .credit{font-size:15px}.mcredit{font-size:14px}.lockview h2{font-size:30px}.lockview p{font-size:18px}.lockview .ubtn{font-size:20px;padding:12px 34px}
+  .mcard{padding:30px 22px 24px}.mcard h2{font-size:26px}.mcard p{font-size:18px}
+  .pinbig{font-size:26px;padding:14px}.mcard .ubtn{font-size:20px;padding:12px 34px}.pinmsg{font-size:18px}.linkbtn{font-size:17px}
+}
+.lockview{display:none;place-items:center;text-align:center;padding:56px 20px 40px;gap:10px;animation:rise .7s both}
+body.locked .lockview{display:grid}
+body.locked #total,body.locked #mains,body.locked #subs,body.locked .bar,body.locked .wrap{display:none!important}
+.lockico{width:96px;height:96px;border-radius:30px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#6d5dfc,#ec4899);box-shadow:0 18px 44px rgba(109,93,252,.45);animation:floaty 4s ease-in-out infinite}
+.lockico svg{width:46px;height:46px}
+.lockview h2{margin:12px 0 0;font-size:28px}.lockview p{margin:0 0 8px;color:var(--muted)}
+.credit{margin:28px 0 8px;text-align:center;color:var(--muted);font-size:13.5px;letter-spacing:.02em;animation:fade .8s 1s both}
+.credit .dm{color:#ec4899;margin-right:6px}
+.credit b,.mcredit b{background:linear-gradient(90deg,#7c6cff,#ec4899,#7c6cff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 6s linear infinite;font-weight:800}
+.credit a,.mcredit a{color:inherit}
+.mcredit{margin-top:16px;font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;opacity:1!important}}
+</style>
+</head>
+<body>
+<div class="blobs" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="shell">
+  <header>
+    <div class="hleft"><h1 id="title" title="Back to the first page">Driver Update Sheet</h1><div class="date" id="date"></div></div>
+    <div class="hperson" id="hperson" hidden></div>
+    <div class="hright">
+      <div class="status" id="status"><i></i><span id="stxt">Loading…</span><button id="refresh">Refresh</button></div>
+      <button class="lo" id="logoutAll" hidden>Log out</button>
+    </div>
+  </header>
+
+  <div class="warn" id="warn"></div>
+  <div class="lockview" id="lockview">
+    <div class="lockico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.7" r="1.3" fill="currentColor"/></svg></div>
+    <h2>Dashboard locked</h2><p>Enter your PIN to open it.</p>
+    <button class="ubtn" id="unlockBtn">Enter PIN</button>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="total" id="total" role="button" tabindex="0" aria-label="View all vehicles">
+    <div class="donut">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="52"/><circle class="seg" data-m="F" cx="60" cy="60" r="52"/><circle class="seg" data-m="G" cx="60" cy="60" r="52"/><circle class="seg" data-m="K" cx="60" cy="60" r="52"/></svg>
+      <div class="dc"><b id="totalN">0</b><small>vehicles</small></div>
+    </div>
+    <div class="tinfo">
+      <span class="tlabel">Total vehicles</span>
+      <div class="legend" id="legend"></div>
+      <span class="tgo">View all vehicles →</span>
+    </div>
+  </div>
+  <div class="mains" id="mains"></div>
+  <div class="subs" id="subs"><div><div class="chips" id="chips"></div></div></div>
+
+  <div class="bar">
+    <div class="info" id="info"></div>
+    <input class="search" id="q" type="search" placeholder="Search vehicle, driver, code, phone…" aria-label="Search">
+  </div>
+
+  <div class="wrap"><table>
+    <thead><tr><th>Sl.No.</th><th>Vehicle No.</th><th>Location</th><th>Category</th><th>Capacity</th><th>Sub Location</th><th>Bag</th><th>Group</th><th>Driver Name</th><th>Code No</th><th>Phone Number</th><th>Vendor Code</th><th>Status</th></tr></thead>
+    <tbody id="body"></tbody>
+  </table></div>
+  <footer class="credit" id="credit"></footer>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="mcard" id="mcard">
+    <h2>Enter your PIN</h2>
+    <p id="msub"></p>
+    <input id="pinIn" class="pinbig" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" aria-label="PIN">
+    <div class="mrow2"><button id="pinGo" class="ubtn">Enter</button><span class="pinmsg" id="pinmsg"></span></div>
+    <div class="mcredit" id="mcredit"></div>
+  </div>
+</div>
+
+<script>
+/* ================= SETTINGS ================= */
+/* ===== YOUR MARK =====  Put your own name here. It is shown at the bottom of every page, in the PIN window,
+   in the page title tooltip and as a signature in the browser console. */
+const DEVELOPER={name:"Your Name Here",role:"Developer",contact:""};   // contact: an e-mail, phone number or website (optional)
+const REFRESH_SECONDS=15;   // how often the page quietly checks the Google Sheet for changes (smaller = faster, but more load)
+const API_URL="https://script.google.com/macros/s/AKfycbxVcDt16nblwWaKFC3CXD4O-eU6dHuIVzIsP7zwarvdWCp1eCUi19OT7lNTkR6F2j4/exec"; // Google Apps Script Web App (reads and saves to your Google Sheet)
+
+const MAINS={
+  F:{name:"Factory Truck",sub:"Groups A, B, C",color:"#6d5dfc",groups:["A","B","C"]},
+  G:{name:"Ghat Truck",sub:"Ghat A, Ghat B",color:"#ec4899",groups:["GA","GB"]},
+  K:{name:"Bulk Carrier",sub:"Single group",color:"#0891b2",groups:["BK"]},
+  ALL:{name:"All Vehicles",sub:"Every group",color:"#475569",groups:["A","B","C","GA","GB","BK"]}
+};
+const GROUPS={
+  A:{main:"F",name:"A Group",sub:"100, 150, 200 bags",color:"#6d5dfc"},
+  B:{main:"F",name:"B Group",sub:"300, 400 bags",color:"#16a34a"},
+  C:{main:"F",name:"C Group",sub:"all others",color:"#f59e0b"},
+  GA:{main:"G",name:"Ghat A Group",sub:"selected ghats",color:"#ec4899"},
+  GB:{main:"G",name:"Ghat B Group",sub:"selected ghats",color:"#3b82f6"},
+  BK:{main:"K",name:"Bulk Carrier Group",sub:"all bulk carriers",color:"#0891b2"}
+};
+function groupOf(r){
+  const all=(r.loc+" "+r.cat+" "+r.sub+" "+r.cap).toLowerCase();
+  if(all.includes("bulk"))return "BK";
+  const small=[100,150,200].includes(r.bag);
+  if(/ghat/i.test(r.loc))return small?"GA":"GB";
+  return small?"A":[300,400].includes(r.bag)?"B":"C";
+}
+
+const norm=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,"");
+
+/* ================= STATE ================= */
+let me=null,pinTarget=null;const timers={};let needPin=true;   // locked until the server says otherwise
+const IDLE_MS=10*60*1000;let lastAct=Date.now();
+let toastT;function toast(t,err){const e=$("toast");e.textContent=t;e.className="toast show"+(err?" err":"");clearTimeout(toastT);toastT=setTimeout(()=>e.className="toast",err?5000:1800)}
+function apiCall(params){
+  return new Promise((res,rej)=>{
+    const cb="ap"+Math.random().toString(36).slice(2),s=document.createElement("script");let ok=false;
+    const done=()=>{clearTimeout(t);delete window[cb];s.remove()};
+    const t=setTimeout(()=>{done();rej(new Error("timed out"))},30000);
+    window[cb]=d=>{ok=true;done();res(d)};
+    s.onload=()=>{if(!ok){done();rej(new Error("the Web App returned a page, not data. In Deploy settings, 'Who has access' must be Anyone"))}};
+    s.onerror=()=>{if(!ok){done();rej(new Error("blocked or no internet"))}};
+    s.src=API_URL+(API_URL.indexOf("?")>=0?"&":"?")+new URLSearchParams(Object.assign({},params,{callback:cb})).toString();
+    document.head.appendChild(s);
+  });
+}
+const pend={};let saving=0;
+function scheduleSave(r,field){
+  (pend[r.v]=pend[r.v]||{})[field]=r[field];
+  clearTimeout(timers[r.v]);
+  timers[r.v]=setTimeout(async()=>{
+    const ch=pend[r.v];delete pend[r.v];
+    if(!ch||!Object.keys(ch).length)return;
+    saving++;
+    toast("Saving to Google Sheet…");
+    try{
+      const d=await apiCall(Object.assign({action:"save",v:r.v,group:r.g,pin:me?me.pin:""},ch));
+      if(d.ok){
+        if("code" in ch&&typeof d.name==="string"){
+          r.name=d.name;
+          const tr=[...$("body").children].find(t=>t.dataset&&t.dataset.v===r.v);
+          if(tr)tr.querySelector("[data-name]").textContent=d.name;
+        }
+        toast("Saved to Google Sheet ✓");
+      }else toast("Not saved: "+d.error,true);
+    }catch(e){toast("Not saved: "+e.message,true)}
+    saving--;
+  },700);
+}
+let live=false,rows=[],drivers={},main=null,sub=null,query="";
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const setRows=list=>{rows=list.map(r=>{const o=Object.assign({},r);if(!(o.g&&GROUPS[o.g]))o.g=groupOf(o);return o})};
+const inMain=(r,m)=>m==="ALL"||GROUPS[r.g].main===m;
+const countG=g=>rows.filter(r=>r.g===g).length;
+const countM=m=>rows.filter(r=>inMain(r,m)).length;
+
+function save(r,obj){Object.assign(r,obj)}
+function countUp(el,to){const t0=performance.now();(function f(t){const p=Math.min((t-t0)/600,1);el.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0)}
+
+/* ================= UI ================= */
+const tickClock=()=>{const n=new Date();document.getElementById("date").textContent=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+" · "+n.toLocaleTimeString("en-GB")};
+tickClock();setInterval(tickClock,1000);
+const $=id=>document.getElementById(id);
+
+function curColor(){return sub?GROUPS[sub].color:main?MAINS[main].color:"#475569"}
+
+const ICON={
+  F:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l6 3.5V9l6 3.5V5h4v16z"/><path d="M3 21h18"/></svg>',
+  G:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8M5 14c0 4 3 7 7 7s7-3 7-7"/></svg>',
+  K:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h11v9H2zM13 10h4l4 3v3h-8"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/></svg>'};
+const gate=id=>{if(needPin&&!me){askPin(id);return}openMain(id)};   // PIN first, then open
+function buildMains(){
+  const box=$("mains");
+  if(!box.children.length){
+    Object.entries(MAINS).filter(([id])=>id!=="ALL").forEach(([id,m],n)=>{
+      const b=document.createElement("button");
+      b.className="mbtn";b.dataset.id=id;b.style.setProperty("--c",m.color);b.style.setProperty("--n",n);
+      b.innerHTML='<span class="mglow"></span><span class="micon">'+ICON[id]+'</span><span class="mrow"><span class="mname">'+m.name+'</span><span class="mcount">0</span></span><span class="msub">'+m.sub+'</span><span class="mbar"><i></i></span><span class="mgo">Open <em>→</em></span>';
+      b.onclick=()=>{
+        if(main===id){main=null;sub=null;render();return}      // tap the open card again = back to the first page
+        gate(id);
+      };
+      box.appendChild(b);
+    });
+  }
+  const total=rows.length;
+  [...box.children].forEach(b=>{
+    b.classList.toggle("on",main===b.dataset.id);
+    const el=b.querySelector(".mcount"),n=countM(b.dataset.id);
+    if(el.dataset.n!==String(n)){el.dataset.n=n;countUp(el,n)}
+    b.querySelector(".mbar i").style.width=(total?Math.round(n/total*100):0)+"%";
+  });
+}
+const DC=2*Math.PI*52;
+function updateTotal(){
+  const total=rows.length,tn=$("totalN");
+  if(tn.dataset.n!==String(total)){tn.dataset.n=total;countUp(tn,total)}
+  let acc=0;
+  document.querySelectorAll("#total .seg").forEach((c,i)=>{
+    const m=c.dataset.m,n=countM(m),share=total?n/total:0,len=Math.max(share*DC-(n&&n<total?3:0),0);
+    c.style.stroke=MAINS[m].color;c.style.strokeDasharray=len+" "+DC;c.style.strokeDashoffset=-(acc*DC);c.style.transitionDelay=(i*140)+"ms";
+    acc+=share;
+  });
+  $("legend").innerHTML=Object.entries(MAINS).filter(([id])=>id!=="ALL").map(([id,m])=>'<span><i style="background:'+m.color+'"></i>'+m.name+'<b>'+countM(id)+'</b></span>').join("");
+}
+let wasLanding=true;
+function replay(){document.querySelectorAll(".mbtn,.total").forEach(e=>{e.style.animation="none";void e.offsetWidth;e.style.animation=""})}
+function openMain(id){main=id;sub=MAINS[id].groups.length===1?MAINS[id].groups[0]:null;render()}
+let chipKey="";
+function buildChips(){
+  const subs=$("subs"),chips=$("chips");
+  if(!main){subs.classList.remove("open");chipKey="";return}
+  const k=main+"|"+sub+"|"+rows.length+"|"+(me?me.group:"");
+  if(k===chipKey){subs.classList.add("open");return}
+  chipKey=k;chips.innerHTML="";
+  MAINS[main].groups.forEach((g,n)=>{
+    const d=GROUPS[g],b=document.createElement("button");
+    b.className="chip"+(sub===g?" on":"");b.style.setProperty("--c",d.color);b.style.setProperty("--n",n);
+    b.innerHTML=d.name+' <small>'+d.sub+'</small> <b>'+countG(g)+'</b>'+(me&&me.group===g?' <span title="You can edit this group">✎</span>':'');
+    b.onclick=()=>{sub=sub===g&&MAINS[main].groups.length>1?null:g;render()};
+    chips.appendChild(b);
+  });
+  subs.classList.add("open");
+}
+
+const digits=x=>String(x==null?"":x).replace(/\D/g,"");
+const hy=d=>d.length>5?d.slice(0,5)+"-"+d.slice(5):d;                // 01712-345678
+const fmtPhone=x=>{const d=digits(x);return d.length===11?hy(d):String(x==null?"":x)};
+const initials=n=>{const w=String(n||"").replace(/\./g,"").split(/\s+/).filter(x=>x&&!/^md$/i.test(x));return ((w[0]||"")[0]||"")+((w[1]||"")[0]||"")};
+function makeAvatar(file){   // centre-crop to a square and shrink to a small JPEG
+  return new Promise((res,rej)=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{URL.revokeObjectURL(url);
+      const m=Math.min(img.width,img.height);
+      for(const size of [144,120,96]){
+        const c=document.createElement("canvas");c.width=c.height=size;
+        c.getContext("2d").drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,size,size);
+        for(let q=.85;q>=.35;q-=.1){const out=c.toDataURL("image/jpeg",q);if(out.length<=8400)return res(out)}
+      }
+      rej(new Error("picture is too detailed, try another one"))};
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("this file is not a picture"))};
+    img.src=url;
+  });
+}
+async function uploadPhoto(dataUrl){
+  const id=Math.random().toString(36).slice(2,10),CH=1800,n=Math.ceil(dataUrl.length/CH);
+  let last;
+  for(let i=0;i<n;i++){
+    last=await apiCall({action:"photo",group:me.group,pin:me.pin,id,i,n,data:dataUrl.slice(i*CH,(i+1)*CH)});
+    if(!last.ok)throw new Error(last.error||"upload failed");
+  }
+  return last;
+}
+const avatar=p=>'<span class="av">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="">':esc(initials(p.name)||"•"))+'</span>';
+function lockUp(msg){   // leave: all data is removed from the page and the PIN window opens again
+  me=null;main=null;sub=null;setRows([]);drivers={};lastSig="";live=false;
+  if(msg)toast(msg);status("","🔒 Locked");render();askPin(null);
+}
+function logout(msg){
+  Object.keys(pend).length||saving?setTimeout(()=>lockUp(msg),1500):lockUp(msg);   // let a just-typed change finish saving first
+}
+/* ---- PIN window ---- */
+function askPin(target){
+  pinTarget=target||null;
+  $("msub").textContent=target?"to open "+MAINS[target].name:"to open the dashboard";
+  $("pinIn").value="";$("pinmsg").textContent="";$("pinGo").disabled=false;$("modal").hidden=false;
+  setTimeout(()=>$("pinIn").focus(),50);
+}
+const closePin=()=>{if(needPin&&!me)return;$("modal").hidden=true};   // cannot be closed while locked
+async function pinGo(){
+  const pin=$("pinIn").value.trim();
+  if(!pin){$("pinmsg").textContent="Enter your PIN";return}
+  $("pinGo").disabled=true;$("pinmsg").textContent="";
+  try{
+    const d=await apiCall({action:"login",pin});
+    if(d.ok){
+      me={group:d.group||"",role:d.role||"edit",pin,person:d.person||{name:"",title:"",photo:""}};lastAct=Date.now();
+      closePin();const t=pinTarget;pinTarget=null;
+      await load();                                   // the data is requested only now, with the PIN
+      toast("Welcome"+(me.person.name?", "+me.person.name:"")+(me.group?" — you can edit "+GROUPS[me.group].name:" — view only"));
+      if(t&&main!==t)openMain(t);
+      return;
+    }
+    $("pinmsg").textContent="Wrong PIN";
+    const c=$("mcard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");$("pinIn").select();
+  }catch(e){$("pinmsg").textContent="Could not check PIN ("+e.message+")"}
+  $("pinGo").disabled=false;
+}
+const canEdit=r=>needPin?(!!me&&!!me.group&&r.g===me.group):(!!sub&&r.g===sub);
+function renderHeader(){
+  const box=$("hperson");
+  $("logoutAll").hidden=!(needPin&&me);
+  if(!(needPin&&me)){box.hidden=true;box.innerHTML="";return}
+  const p=me.person||{},g=me.group?GROUPS[me.group]:null;
+  box.innerHTML='<label class="avwrap" title="Change photo">'+avatar({name:p.name||(g?g.name:"Viewer"),photo:p.photo})+'<input type="file" id="photoIn" accept="image/*" hidden></label>'
+    +'<span class="who"><b>'+esc(p.name||(g?g.name:"Viewer"))+'</b><small>'+(p.title?esc(p.title)+' · ':'')+(g?'<span style="color:'+g.color+';font-weight:700">'+g.name+'</span>':'<span style="color:#22c55e;font-weight:700">View only</span>')+'</small></span>';
+  box.hidden=false;
+  $("photoIn").onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;lastAct=Date.now();
+    try{toast("Uploading photo…");
+      const url=await makeAvatar(f);await uploadPhoto(url);
+      me.person.photo=url;toast("Photo updated ✓");renderHeader();
+    }catch(err){toast("Photo not saved: "+err.message,true)}
+  };
+}
+const LBL=["Sl.No.","Vehicle No.","Location","Category","Capacity","Sub Location","Bag","Group","Driver Name","Code No","Phone Number","Vendor Code","Status"];
+const statusPill=t=>{t=String(t||"").trim();if(!t)return '<span class="dash">—</span>';let h=0;for(const ch of t.toLowerCase())h=(h*31+ch.charCodeAt(0))%360;return '<span class="st" style="--h:'+h+'">'+esc(t)+'</span>'};
+const tdh=(i,inner,cls,extra)=>'<td data-l="'+LBL[i]+'"'+(cls?' class="'+cls+'"':'')+(extra||'')+'>'+inner+'</td>';
+
+function render(){
+  document.body.classList.toggle("landing",main===null);
+  document.documentElement.style.setProperty("--cur",curColor());
+  renderHeader();
+  updateTotal();
+  if(main===null&&!wasLanding)replay();
+  wasLanding=main===null;
+  document.body.classList.toggle("locked",needPin&&!me);
+  closeEdit(true);
+  buildMains();buildChips();
+  const info=$("info"),body=$("body");
+  if(main===null){info.innerHTML="";body.innerHTML="";return}      // first page: only the cards and the total
+  const scope=rows.filter(r=>sub?r.g===sub:inMain(r,main));
+  const list=scope.filter(r=>!query||[r.v,r.name,r.code,fmtPhone(r.phone),r.phone,r.vendor,r.sub,r.status].join(" ").toLowerCase().includes(query));
+  const title=sub?GROUPS[sub].name:MAINS[main].name;
+  const mineHere=needPin&&me&&!!me.group&&scope.some(r=>r.g===me.group);
+  let msg,pill,pc="";
+  if(!needPin){msg=sub?"You can edit Code No, Phone Number and Vendor Code below.":"Choose a sub group above to edit.";pill=sub?"Editing enabled":"Read only";pc=sub?" edit":""}
+  else if(me&&!me.group){msg="View only: you can look at every group but cannot change anything.";pill="Read only"}
+  else if(me){const g=GROUPS[me.group];msg='You can edit <b style="color:'+g.color+'">'+g.name+'</b> only. Other groups are view only.<br><small style="color:var(--muted)">Auto log-out after 10 minutes without an update.</small>';pill=mineHere?"Editing: "+g.name:"Read only";pc=mineHere?" edit":""}
+  else{msg="View only.";pill="Read only"}
+  info.innerHTML='<button id="gohome" class="ubtn ghost">← Home</button><span class="grow"><b>'+title+'</b> — '+list.length+' vehicles. '+msg+'</span>'
+    +(needPin&&me&&me.group&&!mineHere?'<button id="gomine" class="ubtn">Go to my group</button>':'')
+    +'<span class="pill'+pc+'">'+pill+'</span>';
+  $("gohome").onclick=()=>{main=null;sub=null;render()};
+  if($("gomine"))$("gomine").onclick=()=>{main=GROUPS[me.group].main;sub=me.group;render()};
+
+  body.innerHTML="";
+  if(!list.length){body.innerHTML='<tr><td class="empty" colspan="13">No vehicles found.</td></tr>';return}
+  list.forEach((r,n)=>{
+    const tr=document.createElement("tr");tr.style.setProperty("--i",Math.min(n,22));tr.style.setProperty("--g",GROUPS[r.g].color);
+    const ed=canEdit(r);if(ed)tr.className="mine";
+    const ec=(i,f)=>tdh(i,shown(r,f),"ec",' data-f="'+f+'" tabindex="0" role="button" title="Click to edit '+LBL[i]+'"');
+    tr.innerHTML=tdh(0,n+1)+tdh(1,'<b>'+esc(r.v)+'</b><span class="vcat">'+esc(r.cat)+'</span><span class="vbag">'+r.bag+' bag</span>')+tdh(2,esc(r.loc))+tdh(3,esc(r.cat))+tdh(4,esc(r.cap))+tdh(5,esc(r.sub))+tdh(6,r.bag)
+      +tdh(7,'<span class="tag" style="background:'+GROUPS[r.g].color+'">'+GROUPS[r.g].name+'</span>')
+      +tdh(8,esc(r.name),"l"," data-name")
+      +(ed?ec(9,"code"):tdh(9,esc(r.code)))
+      +(ed?ec(10,"phone"):tdh(10,esc(fmtPhone(r.phone))))
+      +(ed?ec(11,"vendor"):tdh(11,esc(r.vendor)))
+      +tdh(12,statusPill(r.status));
+    tr.dataset.v=r.v;
+    if(ed){   // nothing is editable until you click the exact cell you want to change
+      tr.addEventListener("click",e=>{const td=e.target.closest("td.ec");if(td)startEdit(tr,td,r)});
+      tr.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("ec")){e.preventDefault();startEdit(tr,e.target,r)}});
+    }
+    body.appendChild(tr);
+  });
+}
+const shown=(r,f)=>{const v=f==="phone"?fmtPhone(r.phone):r[f];return v?esc(v):'<span class="dash">—</span>'};
+/* One vehicle at a time: clicking a cell of a vehicle opens Code No, Phone and Vendor of THAT vehicle only.
+   Every other vehicle stays plain text, so nothing else can be changed by mistake. */
+let activeRow=null;
+const setName=(cell,nm)=>{if(cell&&cell.textContent!==nm){cell.textContent=nm;cell.classList.remove("hit");void cell.offsetWidth;cell.classList.add("hit")}};
+function startEdit(tr,td,r){
+  if(!canEdit(r))return;
+  if(activeRow&&activeRow.tr===tr){const el=activeRow.els[td.dataset.f];if(el&&document.activeElement!==el)el.focus();return}
+  closeEdit(true);                                  // finish the vehicle that was open before
+  const els={},before={code:r.code,phone:r.phone,vendor:r.vendor},nameBefore=r.name,nameCell=tr.querySelector("[data-name]");
+  tr.classList.add("editing-row");
+  tr.querySelectorAll("td.ec").forEach(c=>{
+    const f=c.dataset.f,el=document.createElement("input");
+    el.dataset.f=f;el.autocomplete="off";el.setAttribute("aria-label",f);
+    if(f==="code")el.maxLength=20;else if(f==="phone"){el.inputMode="numeric";el.maxLength=12;el.placeholder="01XXX-XXXXXX"}else{el.inputMode="numeric";el.maxLength=7}
+    el.value=f==="phone"?fmtPhone(r.phone):r[f];
+    c.classList.add("editing");c.textContent="";c.appendChild(el);els[f]=el;
+    el.addEventListener("input",()=>{
+      lastAct=Date.now();
+      if(f==="phone"){const d=digits(el.value).slice(0,11);el.value=hy(d);el.classList.toggle("miss",!(d.length===0||d.length===11))}
+      else if(f==="vendor"){el.value=digits(el.value).slice(0,7)}
+      else{const nm=drivers[norm(el.value)]||"";el.classList.toggle("miss",!!el.value.trim()&&!nm&&Object.keys(drivers).length>0);setName(nameCell,nm)}   // preview only
+    });
+    el.addEventListener("keydown",e=>{
+      if(e.key==="Enter"){e.preventDefault();closeEdit(true)}
+      else if(e.key==="Escape"){e.preventDefault();closeEdit(false)}
+    });
+  });
+  const bar=document.createElement("div");bar.className="ract";
+  bar.innerHTML='<button type="button" class="ok">✓ Save</button><button type="button" class="no">✕ Cancel</button>';
+  tr.querySelector('td.ec[data-f="vendor"]').appendChild(bar);
+  bar.querySelector(".ok").onclick=e=>{e.stopPropagation();closeEdit(true)};
+  bar.querySelector(".no").onclick=e=>{e.stopPropagation();closeEdit(false)};
+  activeRow={tr,r,els,before,nameBefore,nameCell};lastAct=Date.now();
+  const first=els[td.dataset.f]||els.code;first.focus();first.select();
+}
+function closeEdit(commit){
+  if(!activeRow)return;
+  const {tr,r,els,before,nameBefore,nameCell}=activeRow;activeRow=null;
+  const changes={};
+  if(commit){
+    const code=els.code.value.trim(),ph=digits(els.phone.value).slice(0,11),ven=digits(els.vendor.value).slice(0,7);
+    if(code!==before.code)changes.code=code;
+    if(ph!==digits(before.phone)){if(ph.length===0||ph.length===11)changes.phone=ph;else toast("Phone number must be 11 digits — phone not changed",true)}
+    if(ven!==before.vendor)changes.vendor=ven;
+  }
+  Object.keys(changes).forEach(f=>save(r,{[f]:changes[f]}));
+  if("code" in changes){
+    const nm=drivers[norm(changes.code)]||"";save(r,{name:nm});setName(nameCell,nm);
+    if(changes.code&&!nm&&Object.keys(drivers).length)toast("Code not found in Driver File — saved anyway",true);
+  }else setName(nameCell,nameBefore);
+  tr.classList.remove("editing-row");
+  tr.querySelectorAll("td.ec").forEach(c=>{c.classList.remove("editing");c.innerHTML=shown(r,c.dataset.f)});
+  Object.keys(changes).forEach(f=>scheduleSave(r,f));
+}
+// clicking anywhere outside the open vehicle saves it and closes it
+document.addEventListener("pointerdown",e=>{if(activeRow&&!activeRow.tr.contains(e.target))closeEdit(true)});
+
+/* ================= LOAD ================= */
+function status(kind,text){const s=$("status");s.className="status "+kind;$("stxt").textContent=text}
+let lastSig="";
+async function load(silent){
+  if(!silent){live=false;status("","Loading from Google Sheet…");
+  $("body").innerHTML='<tr><td colspan="13" style="padding:30px"><div class="shimmer"></div><br><div class="shimmer" style="width:70%"></div></td></tr>';}
+  const w=$("warn");let same=false;
+  try{
+    const d=await apiCall({action:"read",pin:me?me.pin:""});
+    if(d.locked){                                     // no (valid) PIN: the server sends no data at all
+      needPin=true;
+      if(me){lockUp("Session ended — enter your PIN again");return}
+      setRows([]);drivers={};live=false;status("","🔒 Locked");w.classList.remove("show");render();
+      if($("modal").hidden)askPin(null);
+      return;
+    }
+    if(!d.ok)throw new Error(d.error||"unknown error");
+    needPin=!!d.pinRequired;if(!needPin){me=null}
+    const sig=JSON.stringify(d.vehicles);same=silent&&sig===lastSig;lastSig=sig;
+    drivers=d.drivers||{};live=true;w.classList.remove("show");
+    if(d.unassigned&&d.unassigned.length){w.innerHTML="<b>These ghat names are not in any group yet:</b> "+d.unassigned.map(esc).join(", ")+" — they are placed in <b>"+GROUPS[d.ghatDefault||"GB"].name+"</b> for now. Add them to GHAT_A or GHAT_B in Code.gs.";w.classList.add("show")}
+    if(!same)setRows(d.vehicles);
+    status("ok",rows.length+" vehicles · "+rows.filter(r=>r.code||r.name).length+" with driver · live · "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}));
+  }catch(e){
+    if(silent){status("bad","Connection lost — retrying");return}
+    setRows([]);drivers={};
+    w.innerHTML="<b>Could not load data from Google Sheet:</b> "+esc(e.message)+'<br><small>Check: the Apps Script is deployed as a Web App with <b>Execute as: Me</b> and <b>Who has access: Anyone</b>, the latest code is deployed as a <b>New version</b>, and you allowed the permissions. <a href="'+API_URL+'?action=read" target="_blank" rel="noopener">Open the Web App link to see its raw reply</a>.</small>';
+    w.classList.add("show");status("bad","Not connected");
+  }
+  if(!same)render();
+}
+$("logoutAll").onclick=()=>logout("Logged out");
+$("unlockBtn").onclick=()=>askPin(null);
+$("title").onclick=()=>{main=null;sub=null;render()};
+$("total").onclick=()=>gate("ALL");
+$("total").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();gate("ALL")}};
+if(window.matchMedia&&matchMedia("(hover:hover)").matches){   // gentle 3-D tilt and glow that follow the mouse
+  $("mains").addEventListener("pointermove",e=>{
+    const b=e.target.closest(".mbtn");if(!b||!document.body.classList.contains("landing"))return;
+    const r=b.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    b.style.setProperty("--ry",((x-.5)*10).toFixed(1)+"deg");b.style.setProperty("--rx",((.5-y)*8).toFixed(1)+"deg");
+    b.style.setProperty("--mx",(x*100).toFixed(0)+"%");b.style.setProperty("--my",(y*100).toFixed(0)+"%");
+  });
+  $("mains").addEventListener("pointerout",e=>{const b=e.target.closest(".mbtn");if(b){b.style.setProperty("--rx","0deg");b.style.setProperty("--ry","0deg")}});
+}
+$("pinGo").onclick=pinGo;$("pinIn").onkeydown=e=>{if(e.key==="Enter")pinGo()};$("pinIn").oninput=()=>{$("pinmsg").textContent=""};
+$("modal").onclick=e=>{if(e.target.id==="modal")closePin()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closePin()});
+// auto log-out: 10 minutes without any update
+// people who can edit: 10 minutes without an update. View-only people: 30 minutes without touching the page.
+const idleCheck=()=>{
+  if(!(needPin&&me))return;
+  if(Date.now()-lastAct>(me.group?IDLE_MS:30*60*1000))logout(me.group?"Logged out: no updates for 10 minutes":"Logged out: inactive for 30 minutes");
+};
+["pointerdown","keydown","scroll"].forEach(ev=>document.addEventListener(ev,()=>{if(me&&!me.group)lastAct=Date.now()},{passive:true}));
+setInterval(idleCheck,10000);document.addEventListener("visibilitychange",idleCheck);
+$("refresh").onclick=async e=>{e.target.classList.add("spin");await load();e.target.classList.remove("spin")};
+$("q").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();render()});
+// ---- developer mark ----
+(function(){
+  const n=esc(DEVELOPER.name),c=String(DEVELOPER.contact||"").trim();
+  const link=!c?"":/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(c)?' · <a href="mailto:'+esc(c)+'">'+esc(c)+'</a>':/^https?:\/\//.test(c)?' · <a href="'+esc(c)+'" target="_blank" rel="noopener">'+esc(c.replace(/^https?:\/\//,""))+'</a>':' · '+esc(c);
+  const html='<span class="dm">◆</span>Designed &amp; developed by <b>'+n+'</b>'+(DEVELOPER.role?' · '+esc(DEVELOPER.role):'')+link;
+  $("credit").innerHTML=html;$("mcredit").innerHTML=html;
+  document.querySelector('meta[name="author"]').content=DEVELOPER.name;
+  $("title").title="Back to the first page — Designed & developed by "+DEVELOPER.name;
+  console.log("%cDriver Update Sheet%c designed & developed by "+DEVELOPER.name,"background:#6d5dfc;color:#fff;padding:3px 8px;border-radius:6px 0 0 6px;font-weight:700","background:#ec4899;color:#fff;padding:3px 8px;border-radius:0 6px 6px 0");
+})();
+setRows([]);render();load();
+// pick up changes made directly in the Google Sheet: every REFRESH_SECONDS, when the page is on screen,
+// and straight away when you come back to the page. Never while someone is typing or saving.
+let quietBusy=false;
+function refreshQuiet(){
+  const a=document.activeElement;
+  if(document.hidden||(needPin&&!me)||quietBusy||saving||activeRow||Object.keys(pend).length||(a&&a.tagName==="INPUT"))return;
+  quietBusy=true;load(true).finally(()=>{quietBusy=false});
+}
+setInterval(refreshQuiet,REFRESH_SECONDS*1000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshQuiet()});
+window.addEventListener("focus",refreshQuiet);
+window.addEventListener("online",refreshQuiet);
+</script>
+</body>
+</html>
