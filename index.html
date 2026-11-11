@@ -1,7 +1,12 @@
 <!DOCTYPE html>
+<!--
+  Driver Update Sheet
+  Designed & developed by: (your name is set in DEVELOPER near the top of the script below)
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="author" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Driver Update Sheet</title>
 <style>
@@ -281,9 +286,21 @@ td.ec.editing{background:transparent!important;box-shadow:none}td.ec.editing::af
   .ract{justify-content:flex-start;gap:8px;margin-top:10px}.ract button{font-size:17px;padding:10px 16px;border-radius:10px}
   tr.editing-row{outline:2px solid var(--g,var(--cur))}
   td.ec.editing input{margin-top:2px}
+  .credit{font-size:15px}.mcredit{font-size:14px}.lockview h2{font-size:30px}.lockview p{font-size:18px}.lockview .ubtn{font-size:20px;padding:12px 34px}
   .mcard{padding:30px 22px 24px}.mcard h2{font-size:26px}.mcard p{font-size:18px}
   .pinbig{font-size:26px;padding:14px}.mcard .ubtn{font-size:20px;padding:12px 34px}.pinmsg{font-size:18px}.linkbtn{font-size:17px}
 }
+.lockview{display:none;place-items:center;text-align:center;padding:56px 20px 40px;gap:10px;animation:rise .7s both}
+body.locked .lockview{display:grid}
+body.locked #total,body.locked #mains,body.locked #subs,body.locked .bar,body.locked .wrap{display:none!important}
+.lockico{width:96px;height:96px;border-radius:30px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#6d5dfc,#ec4899);box-shadow:0 18px 44px rgba(109,93,252,.45);animation:floaty 4s ease-in-out infinite}
+.lockico svg{width:46px;height:46px}
+.lockview h2{margin:12px 0 0;font-size:28px}.lockview p{margin:0 0 8px;color:var(--muted)}
+.credit{margin:28px 0 8px;text-align:center;color:var(--muted);font-size:13.5px;letter-spacing:.02em;animation:fade .8s 1s both}
+.credit .dm{color:#ec4899;margin-right:6px}
+.credit b,.mcredit b{background:linear-gradient(90deg,#7c6cff,#ec4899,#7c6cff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 6s linear infinite;font-weight:800}
+.credit a,.mcredit a{color:inherit}
+.mcredit{margin-top:16px;font-size:12.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;opacity:1!important}}
 </style>
 </head>
@@ -295,12 +312,16 @@ td.ec.editing{background:transparent!important;box-shadow:none}td.ec.editing::af
     <div class="hperson" id="hperson" hidden></div>
     <div class="hright">
       <div class="status" id="status"><i></i><span id="stxt">Loading…</span><button id="refresh">Refresh</button></div>
-      <button class="lo in" id="loginBtn" hidden>Log in</button>
       <button class="lo" id="logoutAll" hidden>Log out</button>
     </div>
   </header>
 
   <div class="warn" id="warn"></div>
+  <div class="lockview" id="lockview">
+    <div class="lockico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.7" r="1.3" fill="currentColor"/></svg></div>
+    <h2>Dashboard locked</h2><p>Enter your PIN to open it.</p>
+    <button class="ubtn" id="unlockBtn">Enter PIN</button>
+  </div>
   <div class="toast" id="toast"></div>
   <div class="total" id="total" role="button" tabindex="0" aria-label="View all vehicles">
     <div class="donut">
@@ -325,21 +346,25 @@ td.ec.editing{background:transparent!important;box-shadow:none}td.ec.editing::af
     <thead><tr><th>Sl.No.</th><th>Vehicle No.</th><th>Location</th><th>Category</th><th>Capacity</th><th>Sub Location</th><th>Bag</th><th>Group</th><th>Driver Name</th><th>Code No</th><th>Phone Number</th><th>Vendor Code</th><th>Status</th></tr></thead>
     <tbody id="body"></tbody>
   </table></div>
+  <footer class="credit" id="credit"></footer>
 </div>
 
 <div class="modal" id="modal" hidden>
   <div class="mcard" id="mcard">
-    <button class="mx" id="mclose" aria-label="Close">×</button>
     <h2>Enter your PIN</h2>
     <p id="msub"></p>
     <input id="pinIn" class="pinbig" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" aria-label="PIN">
     <div class="mrow2"><button id="pinGo" class="ubtn">Enter</button><span class="pinmsg" id="pinmsg"></span></div>
-    <button class="linkbtn" id="viewOnly">Continue without PIN (view only)</button>
+    <div class="mcredit" id="mcredit"></div>
   </div>
 </div>
 
 <script>
 /* ================= SETTINGS ================= */
+/* ===== YOUR MARK =====  Put your own name here. It is shown at the bottom of every page, in the PIN window,
+   in the page title tooltip and as a signature in the browser console. */
+const DEVELOPER={name:"Md.Nazmul Hossain",role:"Developer",contact:"nazmul.ruhrd@gmail.com"};   // contact: an e-mail, phone number or website (optional)
+const REFRESH_SECONDS=15;   // how often the page quietly checks the Google Sheet for changes (smaller = faster, but more load)
 const API_URL="https://script.google.com/macros/s/AKfycbxVcDt16nblwWaKFC3CXD4O-eU6dHuIVzIsP7zwarvdWCp1eCUi19OT7lNTkR6F2j4/exec"; // Google Apps Script Web App (reads and saves to your Google Sheet)
 
 const MAINS={
@@ -352,8 +377,8 @@ const GROUPS={
   A:{main:"F",name:"A Group",sub:"100, 150, 200 bags",color:"#6d5dfc"},
   B:{main:"F",name:"B Group",sub:"300, 400 bags",color:"#16a34a"},
   C:{main:"F",name:"C Group",sub:"all others",color:"#f59e0b"},
-  GA:{main:"G",name:"Ghat A Group",sub:"100, 150, 200 bags",color:"#ec4899"},
-  GB:{main:"G",name:"Ghat B Group",sub:"all others",color:"#3b82f6"},
+  GA:{main:"G",name:"Ghat A Group",sub:"selected ghats",color:"#ec4899"},
+  GB:{main:"G",name:"Ghat B Group",sub:"selected ghats",color:"#3b82f6"},
   BK:{main:"K",name:"Bulk Carrier Group",sub:"all bulk carriers",color:"#0891b2"}
 };
 function groupOf(r){
@@ -367,7 +392,7 @@ function groupOf(r){
 const norm=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,"");
 
 /* ================= STATE ================= */
-let me=null,guest=false,pinTarget=null;const timers={};let needPin=false;
+let me=null,pinTarget=null;const timers={};let needPin=true;   // locked until the server says otherwise
 const IDLE_MS=10*60*1000;let lastAct=Date.now();
 let toastT;function toast(t,err){const e=$("toast");e.textContent=t;e.className="toast show"+(err?" err":"");clearTimeout(toastT);toastT=setTimeout(()=>e.className="toast",err?5000:1800)}
 function apiCall(params){
@@ -408,7 +433,7 @@ function scheduleSave(r,field){
 let live=false,rows=[],drivers={},main=null,sub=null,query="";
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const setRows=list=>{rows=list.map(r=>{const o=Object.assign({},r);o.g=groupOf(o);return o})};
+const setRows=list=>{rows=list.map(r=>{const o=Object.assign({},r);if(!(o.g&&GROUPS[o.g]))o.g=groupOf(o);return o})};
 const inMain=(r,m)=>m==="ALL"||GROUPS[r.g].main===m;
 const countG=g=>rows.filter(r=>r.g===g).length;
 const countM=m=>rows.filter(r=>inMain(r,m)).length;
@@ -427,7 +452,7 @@ const ICON={
   F:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l6 3.5V9l6 3.5V5h4v16z"/><path d="M3 21h18"/></svg>',
   G:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8M5 14c0 4 3 7 7 7s7-3 7-7"/></svg>',
   K:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h11v9H2zM13 10h4l4 3v3h-8"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/></svg>'};
-const gate=id=>{if(needPin&&!me&&!guest){askPin(id);return}openMain(id)};   // PIN first, then open
+const gate=id=>{if(needPin&&!me){askPin(id);return}openMain(id)};   // PIN first, then open
 function buildMains(){
   const box=$("mains");
   if(!box.children.length){
@@ -511,18 +536,21 @@ async function uploadPhoto(dataUrl){
   return last;
 }
 const avatar=p=>'<span class="av">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="">':esc(initials(p.name)||"•"))+'</span>';
+function lockUp(msg){   // leave: all data is removed from the page and the PIN window opens again
+  me=null;main=null;sub=null;setRows([]);drivers={};lastSig="";live=false;
+  if(msg)toast(msg);status("","🔒 Locked");render();askPin(null);
+}
 function logout(msg){
-  const go=()=>{me=null;guest=false;main=null;sub=null;if(msg)toast(msg);render()};   // back to the first page
-  Object.keys(pend).length||saving?setTimeout(go,1500):go();   // let a just-typed change finish saving first
+  Object.keys(pend).length||saving?setTimeout(()=>lockUp(msg),1500):lockUp(msg);   // let a just-typed change finish saving first
 }
 /* ---- PIN window ---- */
 function askPin(target){
   pinTarget=target||null;
-  $("msub").textContent=target?"to open "+MAINS[target].name:"to edit your group";
+  $("msub").textContent=target?"to open "+MAINS[target].name:"to open the dashboard";
   $("pinIn").value="";$("pinmsg").textContent="";$("pinGo").disabled=false;$("modal").hidden=false;
   setTimeout(()=>$("pinIn").focus(),50);
 }
-const closePin=()=>{$("modal").hidden=true};
+const closePin=()=>{if(needPin&&!me)return;$("modal").hidden=true};   // cannot be closed while locked
 async function pinGo(){
   const pin=$("pinIn").value.trim();
   if(!pin){$("pinmsg").textContent="Enter your PIN";return}
@@ -530,10 +558,11 @@ async function pinGo(){
   try{
     const d=await apiCall({action:"login",pin});
     if(d.ok){
-      me={group:d.group,pin,person:d.person||{name:"",title:"",photo:""}};guest=false;lastAct=Date.now();
+      me={group:d.group||"",role:d.role||"edit",pin,person:d.person||{name:"",title:"",photo:""}};lastAct=Date.now();
       closePin();const t=pinTarget;pinTarget=null;
-      toast("Welcome"+(me.person.name?", "+me.person.name:"")+" — you can edit "+GROUPS[me.group].name);
-      if(t&&main!==t)openMain(t);else render();
+      await load();                                   // the data is requested only now, with the PIN
+      toast("Welcome"+(me.person.name?", "+me.person.name:"")+(me.group?" — you can edit "+GROUPS[me.group].name:" — view only"));
+      if(t&&main!==t)openMain(t);
       return;
     }
     $("pinmsg").textContent="Wrong PIN";
@@ -541,15 +570,14 @@ async function pinGo(){
   }catch(e){$("pinmsg").textContent="Could not check PIN ("+e.message+")"}
   $("pinGo").disabled=false;
 }
-const canEdit=r=>needPin?(!!me&&r.g===me.group):(!!sub&&r.g===sub);
+const canEdit=r=>needPin?(!!me&&!!me.group&&r.g===me.group):(!!sub&&r.g===sub);
 function renderHeader(){
   const box=$("hperson");
   $("logoutAll").hidden=!(needPin&&me);
-  $("loginBtn").hidden=!(needPin&&!me&&guest);
   if(!(needPin&&me)){box.hidden=true;box.innerHTML="";return}
-  const p=me.person||{},g=GROUPS[me.group];
-  box.innerHTML='<label class="avwrap" title="Change photo">'+avatar({name:p.name||g.name,photo:p.photo})+'<input type="file" id="photoIn" accept="image/*" hidden></label>'
-    +'<span class="who"><b>'+esc(p.name||g.name)+'</b><small>'+(p.title?esc(p.title)+' · ':'')+'<span style="color:'+g.color+';font-weight:700">'+g.name+'</span></small></span>';
+  const p=me.person||{},g=me.group?GROUPS[me.group]:null;
+  box.innerHTML='<label class="avwrap" title="Change photo">'+avatar({name:p.name||(g?g.name:"Viewer"),photo:p.photo})+'<input type="file" id="photoIn" accept="image/*" hidden></label>'
+    +'<span class="who"><b>'+esc(p.name||(g?g.name:"Viewer"))+'</b><small>'+(p.title?esc(p.title)+' · ':'')+(g?'<span style="color:'+g.color+';font-weight:700">'+g.name+'</span>':'<span style="color:#22c55e;font-weight:700">View only</span>')+'</small></span>';
   box.hidden=false;
   $("photoIn").onchange=async e=>{
     const f=e.target.files[0];if(!f)return;lastAct=Date.now();
@@ -570,6 +598,7 @@ function render(){
   updateTotal();
   if(main===null&&!wasLanding)replay();
   wasLanding=main===null;
+  document.body.classList.toggle("locked",needPin&&!me);
   closeEdit(true);
   buildMains();buildChips();
   const info=$("info"),body=$("body");
@@ -577,18 +606,17 @@ function render(){
   const scope=rows.filter(r=>sub?r.g===sub:inMain(r,main));
   const list=scope.filter(r=>!query||[r.v,r.name,r.code,fmtPhone(r.phone),r.phone,r.vendor,r.sub,r.status].join(" ").toLowerCase().includes(query));
   const title=sub?GROUPS[sub].name:MAINS[main].name;
-  const mineHere=needPin&&me&&scope.some(r=>r.g===me.group);
+  const mineHere=needPin&&me&&!!me.group&&scope.some(r=>r.g===me.group);
   let msg,pill,pc="";
   if(!needPin){msg=sub?"You can edit Code No, Phone Number and Vendor Code below.":"Choose a sub group above to edit.";pill=sub?"Editing enabled":"Read only";pc=sub?" edit":""}
+  else if(me&&!me.group){msg="View only: you can look at every group but cannot change anything.";pill="Read only"}
   else if(me){const g=GROUPS[me.group];msg='You can edit <b style="color:'+g.color+'">'+g.name+'</b> only. Other groups are view only.<br><small style="color:var(--muted)">Auto log-out after 10 minutes without an update.</small>';pill=mineHere?"Editing: "+g.name:"Read only";pc=mineHere?" edit":""}
   else{msg="View only.";pill="Read only"}
   info.innerHTML='<button id="gohome" class="ubtn ghost">← Home</button><span class="grow"><b>'+title+'</b> — '+list.length+' vehicles. '+msg+'</span>'
-    +(needPin&&me&&!mineHere?'<button id="gomine" class="ubtn">Go to my group</button>':'')
-    +(needPin&&!me?'<button id="gologin" class="ubtn">Log in to edit</button>':'')
+    +(needPin&&me&&me.group&&!mineHere?'<button id="gomine" class="ubtn">Go to my group</button>':'')
     +'<span class="pill'+pc+'">'+pill+'</span>';
   $("gohome").onclick=()=>{main=null;sub=null;render()};
   if($("gomine"))$("gomine").onclick=()=>{main=GROUPS[me.group].main;sub=me.group;render()};
-  if($("gologin"))$("gologin").onclick=()=>askPin(main);
 
   body.innerHTML="";
   if(!list.length){body.innerHTML='<tr><td class="empty" colspan="13">No vehicles found.</td></tr>';return}
@@ -677,13 +705,21 @@ async function load(silent){
   $("body").innerHTML='<tr><td colspan="13" style="padding:30px"><div class="shimmer"></div><br><div class="shimmer" style="width:70%"></div></td></tr>';}
   const w=$("warn");let same=false;
   try{
-    const d=await apiCall({action:"read"});
+    const d=await apiCall({action:"read",pin:me?me.pin:""});
+    if(d.locked){                                     // no (valid) PIN: the server sends no data at all
+      needPin=true;
+      if(me){lockUp("Session ended — enter your PIN again");return}
+      setRows([]);drivers={};live=false;status("","🔒 Locked");w.classList.remove("show");render();
+      if($("modal").hidden)askPin(null);
+      return;
+    }
     if(!d.ok)throw new Error(d.error||"unknown error");
-    needPin=!!d.pinRequired;if(!needPin){me=null;guest=false}
+    needPin=!!d.pinRequired;if(!needPin){me=null}
     const sig=JSON.stringify(d.vehicles);same=silent&&sig===lastSig;lastSig=sig;
     drivers=d.drivers||{};live=true;w.classList.remove("show");
+    if(d.unassigned&&d.unassigned.length){w.innerHTML="<b>These ghat names are not in any group yet:</b> "+d.unassigned.map(esc).join(", ")+" — they are placed in <b>"+GROUPS[d.ghatDefault||"GB"].name+"</b> for now. Add them to GHAT_A or GHAT_B in Code.gs.";w.classList.add("show")}
     if(!same)setRows(d.vehicles);
-    status("ok",rows.length+" vehicles · "+Object.keys(drivers).length+" drivers · live · "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}));
+    status("ok",rows.length+" vehicles · "+rows.filter(r=>r.code||r.name).length+" with driver · live · "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}));
   }catch(e){
     if(silent){status("bad","Connection lost — retrying");return}
     setRows([]);drivers={};
@@ -693,7 +729,7 @@ async function load(silent){
   if(!same)render();
 }
 $("logoutAll").onclick=()=>logout("Logged out");
-$("loginBtn").onclick=()=>askPin(main);
+$("unlockBtn").onclick=()=>askPin(null);
 $("title").onclick=()=>{main=null;sub=null;render()};
 $("total").onclick=()=>gate("ALL");
 $("total").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();gate("ALL")}};
@@ -707,21 +743,41 @@ if(window.matchMedia&&matchMedia("(hover:hover)").matches){   // gentle 3-D tilt
   $("mains").addEventListener("pointerout",e=>{const b=e.target.closest(".mbtn");if(b){b.style.setProperty("--rx","0deg");b.style.setProperty("--ry","0deg")}});
 }
 $("pinGo").onclick=pinGo;$("pinIn").onkeydown=e=>{if(e.key==="Enter")pinGo()};$("pinIn").oninput=()=>{$("pinmsg").textContent=""};
-$("mclose").onclick=closePin;$("modal").onclick=e=>{if(e.target.id==="modal")closePin()};
+$("modal").onclick=e=>{if(e.target.id==="modal")closePin()};
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closePin()});
-$("viewOnly").onclick=()=>{guest=true;closePin();const t=pinTarget;pinTarget=null;if(t)openMain(t);else render()};
 // auto log-out: 10 minutes without any update
-const idleCheck=()=>{if(needPin&&me&&Date.now()-lastAct>IDLE_MS)logout("Logged out: no updates for 10 minutes")};
+// people who can edit: 10 minutes without an update. View-only people: 30 minutes without touching the page.
+const idleCheck=()=>{
+  if(!(needPin&&me))return;
+  if(Date.now()-lastAct>(me.group?IDLE_MS:30*60*1000))logout(me.group?"Logged out: no updates for 10 minutes":"Logged out: inactive for 30 minutes");
+};
+["pointerdown","keydown","scroll"].forEach(ev=>document.addEventListener(ev,()=>{if(me&&!me.group)lastAct=Date.now()},{passive:true}));
 setInterval(idleCheck,10000);document.addEventListener("visibilitychange",idleCheck);
 $("refresh").onclick=async e=>{e.target.classList.add("spin");await load();e.target.classList.remove("spin")};
 $("q").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();render()});
+// ---- developer mark ----
+(function(){
+  const n=esc(DEVELOPER.name),c=String(DEVELOPER.contact||"").trim();
+  const link=!c?"":/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(c)?' · <a href="mailto:'+esc(c)+'">'+esc(c)+'</a>':/^https?:\/\//.test(c)?' · <a href="'+esc(c)+'" target="_blank" rel="noopener">'+esc(c.replace(/^https?:\/\//,""))+'</a>':' · '+esc(c);
+  const html='<span class="dm">◆</span>Designed &amp; developed by <b>'+n+'</b>'+(DEVELOPER.role?' · '+esc(DEVELOPER.role):'')+link;
+  $("credit").innerHTML=html;$("mcredit").innerHTML=html;
+  document.querySelector('meta[name="author"]').content=DEVELOPER.name;
+  $("title").title="Back to the first page — Designed & developed by "+DEVELOPER.name;
+  console.log("%cDriver Update Sheet%c designed & developed by "+DEVELOPER.name,"background:#6d5dfc;color:#fff;padding:3px 8px;border-radius:6px 0 0 6px;font-weight:700","background:#ec4899;color:#fff;padding:3px 8px;border-radius:0 6px 6px 0");
+})();
 setRows([]);render();load();
-// pick up changes made directly in the Google Sheet (every 60 s, only when nobody is typing or saving)
-setInterval(()=>{
+// pick up changes made directly in the Google Sheet: every REFRESH_SECONDS, when the page is on screen,
+// and straight away when you come back to the page. Never while someone is typing or saving.
+let quietBusy=false;
+function refreshQuiet(){
   const a=document.activeElement;
-  if(document.hidden||saving||Object.keys(pend).length||(a&&a.tagName==="INPUT"))return;
-  load(true);
-},60000);
+  if(document.hidden||(needPin&&!me)||quietBusy||saving||activeRow||Object.keys(pend).length||(a&&a.tagName==="INPUT"))return;
+  quietBusy=true;load(true).finally(()=>{quietBusy=false});
+}
+setInterval(refreshQuiet,REFRESH_SECONDS*1000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshQuiet()});
+window.addEventListener("focus",refreshQuiet);
+window.addEventListener("online",refreshQuiet);
 </script>
 </body>
 </html>
