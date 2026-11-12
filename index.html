@@ -20,8 +20,8 @@
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif;padding:14px 10px 30px;
   background:radial-gradient(900px 400px at 10% -10%,rgba(109,93,252,.22),transparent 60%),radial-gradient(800px 400px at 100% 0,rgba(236,72,153,.16),transparent 60%),var(--bg)}
-.shell{max-width:1600px;margin:0 auto}
-@media (min-width:761px){body{padding:22px clamp(20px,5vw,90px) 40px}}
+.shell{max-width:1800px;margin:0 auto}
+@media (min-width:1001px){body{padding:22px clamp(12px,2.2vw,36px) 40px}}
 header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:20px;animation:drop .6s cubic-bezier(.2,.8,.2,1) both}
 .hright{justify-self:end;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .hperson{justify-self:center;display:flex;align-items:center;gap:12px;background:var(--card);padding:6px 20px 6px 8px;border-radius:99px;box-shadow:var(--shadow);animation:pop .4s both}
@@ -104,10 +104,10 @@ h1{margin:0;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;font-weight:800
 .search:focus{outline:none;border-color:var(--cur)}
 
 /* table */
-.wrap{overflow:auto;max-height:calc(100vh - 110px);min-height:260px;background:var(--card);border-radius:18px;box-shadow:var(--shadow);animation:drop .6s .4s both}
-table{border-collapse:collapse;width:100%}
-th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.08);background:linear-gradient(135deg,#5b4bd8,#8b5cf6);color:#fff;padding:10px 6px;font-size:12.5px;font-weight:700;text-align:center}
-td{padding:7px 6px;text-align:center;border-top:1px solid var(--line);font-size:14px;overflow-wrap:anywhere}
+.wrap{overflow-x:hidden;overflow-y:auto;max-height:calc(100vh - 110px);min-height:260px;background:var(--card);border-radius:18px;box-shadow:var(--shadow);animation:drop .6s .4s both}
+table{border-collapse:collapse;width:100%;table-layout:fixed}
+th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.08);background:linear-gradient(135deg,#5b4bd8,#8b5cf6);color:#fff;padding:9px 4px;font-size:12px;font-weight:700;text-align:center;line-height:1.25}
+td{padding:6px 4px;text-align:center;border-top:1px solid var(--line);font-size:13px;overflow-wrap:anywhere}
 td:nth-child(2){white-space:nowrap;overflow-wrap:normal}
 td.l{text-align:left}
 tbody tr{animation:rowIn .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*26ms);transition:background .2s}
@@ -115,10 +115,12 @@ tbody tr:hover td{background:color-mix(in srgb,var(--cur) 8%,transparent)}
 tr.mine td{background:var(--mine)}
 .st{display:inline-block;padding:2px 11px;border-radius:99px;font-size:12.5px;font-weight:700;white-space:nowrap;background:hsl(var(--h) 70% 45%/.16);color:hsl(var(--h) 65% 36%)}
 @media (prefers-color-scheme:dark){.st{color:hsl(var(--h) 85% 74%)}}
+.vno{display:inline-block;padding:3px 9px;border-radius:9px;color:#fff;font-weight:800;letter-spacing:.01em;white-space:nowrap;background:linear-gradient(135deg,var(--g,#6d5dfc),color-mix(in srgb,var(--g,#6d5dfc) 60%,#000));box-shadow:0 3px 10px color-mix(in srgb,var(--g,#6d5dfc) 38%,transparent)}
+.gtxt{font-weight:700;font-size:12.5px}
 .tag{display:inline-block;padding:2px 10px;border-radius:99px;color:#fff;font-size:12px;font-weight:700}
-td input{font:inherit;width:100%;min-width:90px;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:5px 9px;transition:border-color .2s,box-shadow .2s,background .3s}
+td input{font:inherit;font-size:12.5px;width:100%;min-width:0;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:4px 5px;transition:border-color .2s,box-shadow .2s,background .3s}
 td input:focus{outline:none;border-color:var(--cur);box-shadow:0 0 0 3px color-mix(in srgb,var(--cur) 25%,transparent)}
-td input[data-f=phone]{min-width:122px}td input[data-f=vendor]{min-width:84px}
+td input[data-f=phone],td input[data-f=vendor]{min-width:0}
 td input.miss{border-color:#ef4444}
 td input.hit{animation:flash .9s}
 .empty{padding:40px;text-align:center;color:var(--muted)}
@@ -216,7 +218,7 @@ td.ec.editing{background:transparent!important;box-shadow:none}td.ec.editing::af
 .avwrap:hover .av{filter:brightness(1.1)}
 .vcat,.vbag{display:none}
 /* phone layout: every vehicle becomes a large, easy-to-read card */
-@media (max-width:760px){
+@media (max-width:1000px){
   body{padding:10px 8px 28px;font-size:20px}
   header{align-items:center;margin-bottom:12px}
   h1{font-size:30px}.date{font-size:17px}
@@ -236,7 +238,7 @@ td.ec.editing{background:transparent!important;box-shadow:none}td.ec.editing::af
   .wrap{max-height:none;overflow:visible;background:transparent;box-shadow:none;min-height:0}
   table,tbody{display:block}
   thead{display:none}
-  tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 14px;position:relative;margin-top:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);margin-bottom:12px;padding:20px 14px 16px 16px;border-left:6px solid var(--g,var(--cur))}
+  tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 14px;position:relative;margin-top:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);margin-bottom:12px;padding:16px 14px 16px 16px;border-left:6px solid var(--g,var(--cur))}
   tr.mine{background:var(--mine)}
   tr.mine td,tbody tr:hover td{background:transparent}
   td{display:block;border:0;padding:0;text-align:left;font-size:21px;line-height:1.3;overflow-wrap:anywhere;min-width:0}
@@ -244,26 +246,29 @@ td.ec.editing{background:transparent!important;box-shadow:none}td.ec.editing::af
   td::before{content:attr(data-l);display:block;font-weight:600;color:var(--muted);font-size:15px;margin-bottom:3px;letter-spacing:.02em}
   td:first-child{display:none}
   td.l{text-align:left}
-  /* card:  [Vehicle  OT ........ 100 bag]  [Driver name]  [Location | Sub Location]  [Capacity | Phone]  [Code | Vendor] */
+  colgroup{display:none}
+  /* card:  [Vehicle  OT ..... 100 bag] [Driver] [Location | Sub Location] [Phone | Code] [Vendor | Status] [Helper Name | Helper Mobile] [Helper Code | Group] */
   td[data-l="Category"],td[data-l="Bag"]{display:none}
-  td[data-l="Vehicle No."]{order:1;grid-column:1/-1;display:flex;align-items:baseline;gap:10px;font-size:28px;font-weight:800}
+  td[data-l="Vehicle No."]{order:1;grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:28px;font-weight:800}
   td[data-l="Vehicle No."]::before{display:none}
+  .vno{padding:5px 16px;border-radius:12px}
   .vcat{display:inline-block;font-size:18px;font-weight:700;padding:1px 10px;border-radius:8px;background:color-mix(in srgb,var(--g,var(--cur)) 22%,transparent);color:var(--ink);line-height:1.4}
   .vbag{display:inline-block;margin-left:auto;font-size:16px;font-weight:600;color:var(--muted)}
   td[data-l="Driver Name"]{order:2;grid-column:1/-1;font-size:22px;font-weight:700;line-height:1.25}
   td[data-l="Location"]{order:3}
   td[data-l="Sub Location"]{order:4}
-  td[data-l="Capacity"]{order:5}
-  td[data-l="Phone Number"]{order:6;font-weight:600}
-  td[data-l="Code No"]{order:7;font-weight:600}
-  td[data-l="Vendor Code"]{order:8;font-weight:600}
-  td[data-l="Status"]{order:10;grid-column:1/-1}
+  td[data-l="Phone Number"]{order:5;font-weight:600}
+  td[data-l="Code No"]{order:6;font-weight:600}
+  td[data-l="Vendor Code"]{order:7;font-weight:600}
+  td[data-l="Status"]{order:8}
+  td[data-l="Helper Name"]{order:9}
+  td[data-l="Helper Mobile No."]{order:10}
+  td[data-l="Helper Code No."]{order:11}
+  td[data-l="Group"]{order:12}
   td[data-l="Status"] .st{font-size:17px;padding:4px 14px}
-  td[data-l="Location"],td[data-l="Sub Location"],td[data-l="Capacity"],td[data-l="Phone Number"],td[data-l="Code No"],td[data-l="Vendor Code"]{font-size:20px}
-  /* group name = small badge on the top edge of the card */
-  td[data-l="Group"]{order:9;position:absolute;top:-11px;right:14px;padding:0}
-  td[data-l="Group"]::before{display:none}
-  td[data-l="Group"] .tag{font-size:14px;padding:3px 12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  td[data-l="Location"],td[data-l="Sub Location"],td[data-l="Phone Number"],td[data-l="Code No"],td[data-l="Vendor Code"],td[data-l="Helper Name"],td[data-l="Helper Mobile No."],td[data-l="Helper Code No."]{font-size:20px}
+  .gtxt{font-size:20px}
+  td input{font-size:19px;padding:11px 10px}
   td input{width:100%;min-width:0;text-align:left;font-size:19px;padding:11px 10px;border-radius:12px}
   .avwrap::after{width:24px;height:24px;font-size:14px}
   td input[data-f=phone],td input[data-f=vendor]{min-width:0}
@@ -343,7 +348,8 @@ body.locked #total,body.locked #mains,body.locked #subs,body.locked .bar,body.lo
   </div>
 
   <div class="wrap"><table>
-    <thead><tr><th>Sl.No.</th><th>Vehicle No.</th><th>Location</th><th>Category</th><th>Capacity</th><th>Sub Location</th><th>Bag</th><th>Group</th><th>Driver Name</th><th>Code No</th><th>Phone Number</th><th>Vendor Code</th><th>Status</th></tr></thead>
+    <colgroup><col style="width:3%"><col style="width:8.5%"><col style="width:5.5%"><col style="width:3.5%"><col style="width:8%"><col style="width:3.5%"><col style="width:5.5%"><col style="width:10.5%"><col style="width:6.5%"><col style="width:8.5%"><col style="width:6%"><col style="width:6.5%"><col style="width:6%"><col style="width:9.5%"><col style="width:8.5%"></colgroup>
+    <thead><tr><th>Sl.No.</th><th>Vehicle No.</th><th>Location</th><th>Category</th><th>Sub Location</th><th>Bag</th><th>Group</th><th>Driver Name</th><th>Code No</th><th>Phone Number</th><th>Vendor Code</th><th>Status</th><th>Helper Code No.</th><th>Helper Name</th><th>Helper Mobile No.</th></tr></thead>
     <tbody id="body"></tbody>
   </table></div>
   <footer class="credit" id="credit"></footer>
@@ -363,7 +369,8 @@ body.locked #total,body.locked #mains,body.locked #subs,body.locked .bar,body.lo
 /* ================= SETTINGS ================= */
 /* ===== YOUR MARK =====  Put your own name here. It is shown at the bottom of every page, in the PIN window,
    in the page title tooltip and as a signature in the browser console. */
-const DEVELOPER={name:"Md.Nazmul Hossain",role:"Developer",contact:"nazmul.ruhrd@gmail.com"};   // contact: an e-mail, phone number or website (optional)
+const DEVELOPER={name:"Md.Nazmul Hossain",role:"System developer",contact:""};   // contact: an e-mail, phone number or website (optional)
+const VERSION="2026-11-12 · helpers + admin";   // shown small in the footer, so you can tell which file version is open
 const REFRESH_SECONDS=15;   // how often the page quietly checks the Google Sheet for changes (smaller = faster, but more load)
 const API_URL="https://script.google.com/macros/s/AKfycbxVcDt16nblwWaKFC3CXD4O-eU6dHuIVzIsP7zwarvdWCp1eCUi19OT7lNTkR6F2j4/exec"; // Google Apps Script Web App (reads and saves to your Google Sheet)
 
@@ -561,7 +568,7 @@ async function pinGo(){
       me={group:d.group||"",role:d.role||"edit",pin,person:d.person||{name:"",title:"",photo:""}};lastAct=Date.now();
       closePin();const t=pinTarget;pinTarget=null;
       await load();                                   // the data is requested only now, with the PIN
-      toast("Welcome"+(me.person.name?", "+me.person.name:"")+(me.group?" — you can edit "+GROUPS[me.group].name:" — view only"));
+      toast("Welcome"+(me.person.name?", "+me.person.name:"")+(isAdminMe()?" — admin: you can edit every group":me.group?" — you can edit "+GROUPS[me.group].name:" — view only"));
       if(t&&main!==t)openMain(t);
       return;
     }
@@ -570,14 +577,15 @@ async function pinGo(){
   }catch(e){$("pinmsg").textContent="Could not check PIN ("+e.message+")"}
   $("pinGo").disabled=false;
 }
-const canEdit=r=>needPin?(!!me&&!!me.group&&r.g===me.group):(!!sub&&r.g===sub);
+const isAdminMe=()=>!!me&&me.role==="admin";   // admin PIN: can edit every group
+const canEdit=r=>needPin?(!!me&&(isAdminMe()||(!!me.group&&r.g===me.group))):(!!sub&&r.g===sub);
 function renderHeader(){
   const box=$("hperson");
   $("logoutAll").hidden=!(needPin&&me);
   if(!(needPin&&me)){box.hidden=true;box.innerHTML="";return}
   const p=me.person||{},g=me.group?GROUPS[me.group]:null;
-  box.innerHTML='<label class="avwrap" title="Change photo">'+avatar({name:p.name||(g?g.name:"Viewer"),photo:p.photo})+'<input type="file" id="photoIn" accept="image/*" hidden></label>'
-    +'<span class="who"><b>'+esc(p.name||(g?g.name:"Viewer"))+'</b><small>'+(p.title?esc(p.title)+' · ':'')+(g?'<span style="color:'+g.color+';font-weight:700">'+g.name+'</span>':'<span style="color:#22c55e;font-weight:700">View only</span>')+'</small></span>';
+  box.innerHTML='<label class="avwrap" title="Change photo">'+avatar({name:p.name||(g?g.name:isAdminMe()?"Admin":"Viewer"),photo:p.photo})+'<input type="file" id="photoIn" accept="image/*" hidden></label>'
+    +'<span class="who"><b>'+esc(p.name||(g?g.name:isAdminMe()?"Admin":"Viewer"))+'</b><small>'+(p.title?esc(p.title)+' · ':'')+(g?'<span style="color:'+g.color+';font-weight:700">'+g.name+'</span>':(isAdminMe()?'<span style="color:#f59e0b;font-weight:700">Admin</span>':'<span style="color:#22c55e;font-weight:700">View only</span>'))+'</small></span>';
   box.hidden=false;
   $("photoIn").onchange=async e=>{
     const f=e.target.files[0];if(!f)return;lastAct=Date.now();
@@ -587,7 +595,7 @@ function renderHeader(){
     }catch(err){toast("Photo not saved: "+err.message,true)}
   };
 }
-const LBL=["Sl.No.","Vehicle No.","Location","Category","Capacity","Sub Location","Bag","Group","Driver Name","Code No","Phone Number","Vendor Code","Status"];
+const LBL=["Sl.No.","Vehicle No.","Location","Category","Sub Location","Bag","Group","Driver Name","Code No","Phone Number","Vendor Code","Status","Helper Code No.","Helper Name","Helper Mobile No."];
 const statusPill=t=>{t=String(t||"").trim();if(!t)return '<span class="dash">—</span>';let h=0;for(const ch of t.toLowerCase())h=(h*31+ch.charCodeAt(0))%360;return '<span class="st" style="--h:'+h+'">'+esc(t)+'</span>'};
 const tdh=(i,inner,cls,extra)=>'<td data-l="'+LBL[i]+'"'+(cls?' class="'+cls+'"':'')+(extra||'')+'>'+inner+'</td>';
 
@@ -604,11 +612,12 @@ function render(){
   const info=$("info"),body=$("body");
   if(main===null){info.innerHTML="";body.innerHTML="";return}      // first page: only the cards and the total
   const scope=rows.filter(r=>sub?r.g===sub:inMain(r,main));
-  const list=scope.filter(r=>!query||[r.v,r.name,r.code,fmtPhone(r.phone),r.phone,r.vendor,r.sub,r.status].join(" ").toLowerCase().includes(query));
+  const list=scope.filter(r=>!query||[r.v,r.name,r.code,fmtPhone(r.phone),r.phone,r.vendor,r.sub,r.status,r.cap,r.hcode,r.hname,fmtPhone(r.hphone),r.hphone].join(" ").toLowerCase().includes(query));
   const title=sub?GROUPS[sub].name:MAINS[main].name;
-  const mineHere=needPin&&me&&!!me.group&&scope.some(r=>r.g===me.group);
+  const mineHere=needPin&&me&&(isAdminMe()?scope.length>0:(!!me.group&&scope.some(r=>r.g===me.group)));
   let msg,pill,pc="";
   if(!needPin){msg=sub?"You can edit Code No, Phone Number and Vendor Code below.":"Choose a sub group above to edit.";pill=sub?"Editing enabled":"Read only";pc=sub?" edit":""}
+  else if(isAdminMe()){msg='<b style="color:#f59e0b">Admin</b>: you can edit every group.<br><small style="color:var(--muted)">Auto log-out after 10 minutes without an update.</small>';pill=mineHere?"Editing: all groups":"Read only";pc=mineHere?" edit":""}
   else if(me&&!me.group){msg="View only: you can look at every group but cannot change anything.";pill="Read only"}
   else if(me){const g=GROUPS[me.group];msg='You can edit <b style="color:'+g.color+'">'+g.name+'</b> only. Other groups are view only.<br><small style="color:var(--muted)">Auto log-out after 10 minutes without an update.</small>';pill=mineHere?"Editing: "+g.name:"Read only";pc=mineHere?" edit":""}
   else{msg="View only.";pill="Read only"}
@@ -619,18 +628,20 @@ function render(){
   if($("gomine"))$("gomine").onclick=()=>{main=GROUPS[me.group].main;sub=me.group;render()};
 
   body.innerHTML="";
-  if(!list.length){body.innerHTML='<tr><td class="empty" colspan="13">No vehicles found.</td></tr>';return}
+  if(!list.length){body.innerHTML='<tr><td class="empty" colspan="15">No vehicles found.</td></tr>';return}
   list.forEach((r,n)=>{
     const tr=document.createElement("tr");tr.style.setProperty("--i",Math.min(n,22));tr.style.setProperty("--g",GROUPS[r.g].color);
     const ed=canEdit(r);if(ed)tr.className="mine";
     const ec=(i,f)=>tdh(i,shown(r,f),"ec",' data-f="'+f+'" tabindex="0" role="button" title="Click to edit '+LBL[i]+'"');
-    tr.innerHTML=tdh(0,n+1)+tdh(1,'<b>'+esc(r.v)+'</b><span class="vcat">'+esc(r.cat)+'</span><span class="vbag">'+r.bag+' bag</span>')+tdh(2,esc(r.loc))+tdh(3,esc(r.cat))+tdh(4,esc(r.cap))+tdh(5,esc(r.sub))+tdh(6,r.bag)
-      +tdh(7,'<span class="tag" style="background:'+GROUPS[r.g].color+'">'+GROUPS[r.g].name+'</span>')
-      +tdh(8,esc(r.name),"l"," data-name")
-      +(ed?ec(9,"code"):tdh(9,esc(r.code)))
-      +(ed?ec(10,"phone"):tdh(10,esc(fmtPhone(r.phone))))
-      +(ed?ec(11,"vendor"):tdh(11,esc(r.vendor)))
-      +tdh(12,statusPill(r.status));
+    tr.innerHTML=tdh(0,n+1)+tdh(1,'<b class="vno">'+esc(r.v)+'</b><span class="vcat">'+esc(r.cat)+'</span><span class="vbag">'+r.bag+' bag</span>')
+      +tdh(2,esc(r.loc))+tdh(3,esc(r.cat))+tdh(4,esc(r.sub))+tdh(5,r.bag)
+      +tdh(6,'<span class="gtxt" style="color:'+GROUPS[r.g].color+'">'+esc(GROUPS[r.g].name.replace(" Group",""))+'</span>')
+      +tdh(7,esc(r.name),"l"," data-name")
+      +(ed?ec(8,"code"):tdh(8,esc(r.code)))
+      +(ed?ec(9,"phone"):tdh(9,esc(fmtPhone(r.phone))))
+      +(ed?ec(10,"vendor"):tdh(10,esc(r.vendor)))
+      +tdh(11,statusPill(r.status))
+      +tdh(12,esc(r.hcode))+tdh(13,esc(r.hname),"l")+tdh(14,esc(fmtPhone(r.hphone)));
     tr.dataset.v=r.v;
     if(ed){   // nothing is editable until you click the exact cell you want to change
       tr.addEventListener("click",e=>{const td=e.target.closest("td.ec");if(td)startEdit(tr,td,r)});
@@ -749,9 +760,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closePin()});
 // people who can edit: 10 minutes without an update. View-only people: 30 minutes without touching the page.
 const idleCheck=()=>{
   if(!(needPin&&me))return;
-  if(Date.now()-lastAct>(me.group?IDLE_MS:30*60*1000))logout(me.group?"Logged out: no updates for 10 minutes":"Logged out: inactive for 30 minutes");
+  if(Date.now()-lastAct>((me.group||isAdminMe())?IDLE_MS:30*60*1000))logout((me.group||isAdminMe())?"Logged out: no updates for 10 minutes":"Logged out: inactive for 30 minutes");
 };
-["pointerdown","keydown","scroll"].forEach(ev=>document.addEventListener(ev,()=>{if(me&&!me.group)lastAct=Date.now()},{passive:true}));
+["pointerdown","keydown","scroll"].forEach(ev=>document.addEventListener(ev,()=>{if(me&&me.role==='view')lastAct=Date.now()},{passive:true}));
 setInterval(idleCheck,10000);document.addEventListener("visibilitychange",idleCheck);
 $("refresh").onclick=async e=>{e.target.classList.add("spin");await load();e.target.classList.remove("spin")};
 $("q").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();render()});
@@ -760,7 +771,7 @@ $("q").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();re
   const n=esc(DEVELOPER.name),c=String(DEVELOPER.contact||"").trim();
   const link=!c?"":/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(c)?' · <a href="mailto:'+esc(c)+'">'+esc(c)+'</a>':/^https?:\/\//.test(c)?' · <a href="'+esc(c)+'" target="_blank" rel="noopener">'+esc(c.replace(/^https?:\/\//,""))+'</a>':' · '+esc(c);
   const html='<span class="dm">◆</span>Designed &amp; developed by <b>'+n+'</b>'+(DEVELOPER.role?' · '+esc(DEVELOPER.role):'')+link;
-  $("credit").innerHTML=html;$("mcredit").innerHTML=html;
+  $("credit").innerHTML=html+'<br><small style="opacity:.6">version '+esc(VERSION)+'</small>';$("mcredit").innerHTML=html;
   document.querySelector('meta[name="author"]').content=DEVELOPER.name;
   $("title").title="Back to the first page — Designed & developed by "+DEVELOPER.name;
   console.log("%cDriver Update Sheet%c designed & developed by "+DEVELOPER.name,"background:#6d5dfc;color:#fff;padding:3px 8px;border-radius:6px 0 0 6px;font-weight:700","background:#ec4899;color:#fff;padding:3px 8px;border-radius:0 6px 6px 0");
