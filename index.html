@@ -762,6 +762,7 @@ async function pinGo(){
   $("pinGo").disabled=false;
 }
 const canEdit=r=>needPin?(!!me&&(me.role==="admin"||(!!me.group&&r.g===me.group))):(!!sub&&r.g===sub);
+const bagLabel=r=>/[A-Za-z]/.test(String(r.bagTxt||""))?String(r.bagTxt).trim():(r.bag+" bag");
 function renderHeader(){
   const box=$("hperson");
   $("logoutAll").hidden=!(needPin&&me);
@@ -1282,7 +1283,6 @@ const CONFIG={API:"https://script.google.com/macros/s/AKfycbxVcDt16nblwWaKFC3CXD
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},
   set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
   del(k){try{localStorage.removeItem(k)}catch(e){}}};
-const bagLabel=r=>/[A-Za-z]/.test(String(r.bagTxt||""))?String(r.bagTxt).trim():(r.bag+" bag");
 let PIN=store.get("hv3pin")||"";   // PIN একবার মেমোরিতে থাকবে
 let pendingLogin=null, ROLE="", DVT="v";
 function askLogin(msg){
