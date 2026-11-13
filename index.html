@@ -425,6 +425,9 @@ td[data-l="Helper Mobile"]{order:12}
 @keyframes spinr{to{transform:rotate(360deg)}}
 .welcome small{display:none}
 @media (max-width:760px){.whead{font-size:18px}.welcome h2{font-size:30px}.welcome p{font-size:19px}}
+.whead{font-size:14px!important;font-weight:600;letter-spacing:.16em;text-transform:uppercase;opacity:.92;margin:12px 0 0}
+.welcome h2{font-size:40px!important;font-weight:800}
+@media (max-width:760px){.whead{font-size:12px!important}.welcome h2{font-size:34px!important}}
 </style>
 </head>
 <body>
@@ -813,7 +816,7 @@ function render(){
     const tr=document.createElement("tr");tr.style.setProperty("--i",Math.min(n,22));tr.style.setProperty("--g",GROUPS[r.g].color);
     const ed=canEdit(r);if(ed)tr.className="mine";
     const ec=(i,f)=>tdh(i,shown(r,f),"ec",' data-f="'+f+'" tabindex="0" role="button" title="Click to edit '+LBL[i]+'"');
-    tr.innerHTML=tdh(0,n+1)+tdh(1,'<b class="vno">'+esc(r.v)+'</b><span class="vcat">'+esc(r.cat)+'</span><span class="gtxt" style="color:'+GROUPS[r.g].color+'">'+GROUPS[r.g].name+'</span><span class="vbag">'+r.bag+' bag</span>')+tdh(2,esc(r.loc))+tdh(3,esc(r.cat))+tdh(4,esc(r.cap))+tdh(5,esc(r.sub))+tdh(6,r.bag)
+    tr.innerHTML=tdh(0,n+1)+tdh(1,'<b class="vno">'+esc(r.v)+'</b><span class="vcat">'+esc(r.cat)+'</span><span class="gtxt" style="color:'+GROUPS[r.g].color+'">'+GROUPS[r.g].name+'</span><span class="vbag">'+bagLabel(r)+'</span>')+tdh(2,esc(r.loc))+tdh(3,esc(r.cat))+tdh(4,esc(r.cap))+tdh(5,esc(r.sub))+tdh(6,bagLabel(r))
       +tdh(7,'<span class="gtxt" style="color:'+GROUPS[r.g].color+'">'+GROUPS[r.g].name+'</span>')
       +tdh(8,esc(r.name),"l"," data-name")
       +(ed?ec(9,"code"):tdh(9,esc(r.code)))
@@ -1279,6 +1282,7 @@ const CONFIG={API:"https://script.google.com/macros/s/AKfycbxVcDt16nblwWaKFC3CXD
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},
   set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
   del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const bagLabel=r=>/[A-Za-z]/.test(String(r.bagTxt||""))?String(r.bagTxt).trim():(r.bag+" bag");
 let PIN=store.get("hv3pin")||"";   // PIN একবার মেমোরিতে থাকবে
 let pendingLogin=null, ROLE="", DVT="v";
 function askLogin(msg){
@@ -1306,7 +1310,7 @@ function renderDV(){
     cnt=rows.length;
     html=rows.map(r=>'<div class="dv-card" style="--g:'+(GCOL[r.g]||"#6d5dfc")+'"><div class="dv-top"><b>'+esc(r.v)+'</b><span class="dv-grp">'+esc(r.g)+'</span></div>'+
       row("ড্রাইভার",r.name)+row("কোড",r.code)+row("মোবাইল",r.phone)+row("লোকেশন",r.loc)+row("Sub location",r.sub)+
-      row("Category",r.cat)+row("Capacity",r.cap)+row("Bag",r.bag)+row("Vendor",r.vendor)+row("Status",r.status)+row("Helper Code",r.hcode)+row("Helper Name",r.hname)+row("Helper Mobile",r.hphone)+'</div>').join("");
+      row("Category",r.cat)+row("Capacity",r.cap)+row("Bag",/[A-Za-z]/.test(String(r.bagTxt||""))?String(r.bagTxt).trim():r.bag)+row("Vendor",r.vendor)+row("Status",r.status)+row("Helper Code",r.hcode)+row("Helper Name",r.hname)+row("Helper Mobile",r.hphone)+'</div>').join("");
   } else {
     const rows=Object.keys(drv).sort().map(k=>({c:k,n:drv[k]})).filter(r=>!q||(r.c+" "+r.n).toLowerCase().indexOf(q)>=0);
     cnt=rows.length;
@@ -1428,7 +1432,9 @@ function vtLine(v){
   if(!r||!r.bag)return "";
   const c=String(r.cat||"").toLowerCase();
   const t=(r.g==="BK"||/bulk/.test(c+" "+r.sub+" "+r.loc))?"বাল্ক":(c.indexOf("cv")>=0?"সিভি":(/(^|\W)ot($|\W)/.test(c)?"ওটি":(r.cat||"")));
-  return "\nগাড়ীর ধরন: "+en2bn(String(r.bag))+" ব্যাগ"+(t?" ("+t+")":"");
+  const unit=String(r.bagTxt||"").replace(/[\d,.\s]/g,"");
+  const bagPart=en2bn(String(r.bag))+(unit?" "+unit:" ব্যাগ");
+  return "\nগাড়ীর ধরন: "+bagPart+(t?" ("+t+")":"");
 }
 function msgText(){
   const d=L[li],[y,m,dd]=E.dt.value.split("-"),CO=CONFIG.COMPANY,rn=E.rn.value.trim(),wk=E.t3.checked;
