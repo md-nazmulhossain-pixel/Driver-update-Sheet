@@ -428,6 +428,34 @@ td[data-l="Helper Mobile"]{order:12}
 .whead{font-size:14px!important;font-weight:600;letter-spacing:.16em;text-transform:uppercase;opacity:.92;margin:12px 0 0}
 .welcome h2{font-size:40px!important;font-weight:800}
 @media (max-width:760px){.whead{font-size:12px!important}.welcome h2{font-size:34px!important}}
+/* ===== registration / set password / approvals ===== */
+.authlinks{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font-size:14px}
+.authlinks a{color:#fff;opacity:.92;cursor:pointer;text-decoration:none!important}
+.modal.login .sub{color:#e6e2ff;text-align:center;font-size:14px;margin:6px 0 0}
+#rform,#sform{}
+#rform[hidden],#sform[hidden],#lform[hidden]{display:none}
+#rform .pwbox,#sform .pwbox{margin-top:10px}
+#adm{position:fixed;inset:0;z-index:8500;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(10,8,30,.5)}
+#adm[hidden]{display:none}
+.admcard{width:100%;max-width:480px;max-height:85vh;overflow:auto;background:var(--card);color:var(--ink);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.admhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:18px}
+.admx{border:0;border-radius:8px;padding:6px 12px;background:var(--cur,#6d5dfc);color:#fff;font:inherit;cursor:pointer}
+.arow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line)}
+.ainfo b{display:block;font-size:16px}
+.ainfo span,.ainfo small{display:block;color:var(--muted);font-size:13px}
+.abtns{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.abtns button{border:0;border-radius:8px;padding:6px 10px;background:var(--cur,#6d5dfc);color:#fff;font:inherit;font-size:13px;cursor:pointer}
+.etile#eAdm{background:linear-gradient(145deg,#10b981,#3b82f6)}
+.etile[hidden]{display:none}
+/* ===== welcome name on one line, waiting screen, reset request button ===== */
+.welcome h2{white-space:nowrap!important;font-size:clamp(20px,7vw,40px)!important}
+.pendbox{text-align:center;padding:10px 4px 6px}
+.pendh{font-size:clamp(22px,6.5vw,30px);font-weight:800;color:#fff;margin:6px 0}
+.pendt{font-size:17px;color:#fff;margin:4px 0 0;font-weight:600}
+.pendc{font-size:15px;color:#e6e2ff;margin:14px 0 0}
+.pendspin{width:44px;height:44px;margin:0 auto 14px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spinr 1s linear infinite}
+.modal.login [hidden]{display:none!important}
+.reqbtn{display:block;width:100%;margin-top:10px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font:inherit;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
@@ -487,10 +515,45 @@ td[data-l="Helper Mobile"]{order:12}
     <div class="mcard" id="mcard">
       <div id="lform">
         <h2>Welcome</h2>
-        <p id="msub">Enter your password to continue</p>
-        <div class="pwbox"><input id="pinIn" type="password" autocomplete="off" placeholder="Password" aria-label="Password"><button type="button" id="pwEye" class="eye" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
+        <p id="msub">Enter your EMPRESS ID and password</p>
+        <div class="pwbox"><input id="empId" type="text" inputmode="numeric" autocomplete="username" placeholder="EMPRESS ID" aria-label="EMPRESS ID"></div>
+        <div class="pwbox"><input id="pinIn" type="password" autocomplete="current-password" placeholder="Password" aria-label="Password"><button type="button" id="pwEye" class="eye" data-for="pinIn" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
         <button id="pinGo" class="loginbtn">Login</button>
         <div class="pinmsg" id="pinmsg"></div>
+        <div class="authlinks" id="authLinks"><a id="goReg">New registration</a><a id="goSet">Forgot Password?</a></div>
+        <div id="pendBox" class="pendbox" hidden>
+          <div class="pendspin"></div>
+          <h2 class="pendh">Registration submitted.</h2>
+          <p class="pendt">Please wait for administrator approval.</p>
+          <p class="pendc">Or call <b>01719-478044</b></p>
+        </div>
+      </div>
+      <div id="rform" hidden>
+        <h2>Register</h2>
+        <p class="sub">Your registration needs administrator approval</p>
+        <div class="pwbox"><input id="rId" type="text" inputmode="numeric" placeholder="EMPRESS ID"></div>
+        <p class="sub" id="rWho"></p>
+        <div id="rNew" hidden>
+          <div class="pwbox"><input id="rName" type="text" placeholder="Name"></div>
+          <div class="pwbox"><input id="rDesig" type="text" placeholder="Designation"></div>
+          <div class="pwbox"><input id="rMobile" type="tel" inputmode="numeric" placeholder="Mobile No."></div>
+        </div>
+        <div class="pwbox"><input id="rPw" type="password" placeholder="Password (min 6)" autocomplete="new-password"><button type="button" class="eye" data-for="rPw" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
+        <div class="pwbox"><input id="rPw2" type="password" placeholder="Conform password" autocomplete="new-password"><button type="button" class="eye" data-for="rPw2" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
+        <button id="regGo" class="loginbtn">Submit</button>
+        <div class="pinmsg" id="regmsg"></div>
+        <div class="authlinks"><a class="back">← Back to login</a></div>
+      </div>
+      <div id="sform" hidden>
+        <h2>Forgot Password</h2>
+        <p class="sub">Forgot your password? Send a request. After approval, set a new password here.</p>
+        <div class="pwbox"><input id="sId" type="text" inputmode="numeric" placeholder="EMPRESS ID"></div>
+        <div class="pwbox"><input id="sPw" type="password" placeholder="New password (min 6)" autocomplete="new-password"><button type="button" class="eye" data-for="sPw" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
+        <div class="pwbox"><input id="sPw2" type="password" placeholder="Conform password" autocomplete="new-password"><button type="button" class="eye" data-for="sPw2" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
+        <button id="sGo" class="loginbtn">Save password</button>
+        <button id="sRq" class="reqbtn" type="button">Request password reset</button>
+        <div class="pinmsg" id="spmsg"></div>
+        <div class="authlinks"><a class="back">← Back to login</a></div>
       </div>
       <div id="welcome" class="welcome" hidden>
         <span class="wpill">Signed in</span>
@@ -682,7 +745,7 @@ async function uploadPhoto(dataUrl){
   return last;
 }
 const avatar=p=>'<span class="av">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="">':esc(initials(p.name)||"•"))+'</span>';
-function lockUp(msg){$("gate").hidden=false;$("backMain").hidden=true;closeHV();$("entry").hidden=true;try{localStorage.removeItem("hv3pin")}catch(e){}   // leave: all data is removed from the page and the PIN window opens again
+function lockUp(msg){if(me&&me.pin)apiCall({action:"logout",pin:me.pin}).catch(()=>{});$("gate").hidden=false;$("backMain").hidden=true;closeHV();$("entry").hidden=true;try{localStorage.removeItem("hv3pin")}catch(e){}   // leave: all data is removed from the page and the PIN window opens again
   me=null;main=null;sub=null;setRows([]);drivers={};lastSig="";live=false;
   if(msg)toast(msg);status("","🔒 Locked");render();askPin(null);
 }
@@ -712,8 +775,10 @@ function pickVerse(){            // every time the login page opens: a new rando
 }
 function askPin(target){
   pinTarget=target||null;
-  $("msub").textContent="Enter your password to continue";$("lform").hidden=false;$("welcome").hidden=true;$("mcard").classList.remove("plain");pickVerse();
-  $("pinIn").value="";$("pinIn").type="password";$("pwEye").classList.remove("on");$("pinmsg").textContent="";$("pinGo").disabled=false;$("modal").hidden=false;
+  let pend="";try{pend=localStorage.getItem("pendId")||""}catch(e){}
+  $("msub").textContent="Enter your password to continue";showForm("lform");$("welcome").hidden=true;$("mcard").classList.remove("plain");pickVerse();
+  $("pinIn").value="";$("pinIn").type="password";$("adm").hidden=true;$("pwEye").classList.remove("on");$("pinmsg").textContent="";$("pinGo").disabled=false;$("modal").hidden=false;
+  if(pend){showPending(pend,true)}
   setTimeout(()=>$("pinIn").focus(),50);
 }
 const closePin=()=>{if(needPin&&!me)return;$("modal").hidden=true};   // cannot be closed while locked
@@ -729,38 +794,141 @@ function letters(el,text,base,step){
   });
 }
 function showWelcome(p){
-  $("lform").hidden=true; $("mcard").classList.add("plain"); const w=$("welcome"); w.hidden=false;
+  showForm("none"); $("mcard").classList.add("plain"); const w=$("welcome"); w.hidden=false;
   letters($("wHead"),"Welcome to Vehicle and Data Management System",0.1,0.035);
   letters($("wName"),p.name||"",1.5,0.06);
   letters($("wTitle"),p.title||"",1.5+(p.name||"").length*0.06+0.25,0.04);
 }
-async function pinGo(){
-  const pin=$("pinIn").value.trim();
-  if(!pin){$("pinmsg").textContent="Enter your password";return}
-  $("pinGo").disabled=true;$("pinmsg").textContent="";
+async function enterWith(d,token){
+  me={group:d.group||"",role:d.role||"edit",pin:token,person:d.person||{name:"",title:"",photo:""},dash:d.dash!==false,hv:!!d.hv,approver:!!d.approver};lastAct=Date.now();
+  $("backMain").hidden=!me.hv;
+  $("gate").hidden=true;
+  try{localStorage.setItem("hv3pin",token)}catch(e){}
+  const t=pinTarget;pinTarget=null;
+  showWelcome(me.person);
+  await Promise.all([load(),sleep(4200)]);       // welcome stays on screen while the data loads
+  closePin();
+  toast("Welcome"+(me.person.name?", "+me.person.name:"")+(me.role==="admin"?" — admin: all groups":me.group?" — you can edit "+GROUPS[me.group].name:" — view only"));
+  if(me.hv&&!t){showEntry();return}
+  if(!me.dash){showEntry();return}
+  if(t&&main!==t)openMain(t);
+  if(!t)showEntry();
+}
+let pendTimer=null;
+function setLoginFields(show){
+  ["empId","pinIn"].forEach(i=>{const w=$(i).closest(".pwbox");if(w)w.hidden=!show});
+  $("pinGo").hidden=!show; $("authLinks").hidden=!show;
+}
+function showPending(id,fromStore){
+  showForm("lform"); $("welcome").hidden=true;
+  $("empId").value=id; $("pinIn").value="";
+  setLoginFields(false); $("pendBox").hidden=false; $("msub").textContent="";
+  if(!fromStore){try{localStorage.setItem("pendId",id)}catch(e){}}
+  clearInterval(pendTimer); pendTimer=setInterval(checkPending,15000);
+  checkPending();
+}
+function hidePending(){
+  $("pendBox").hidden=true; setLoginFields(true); clearInterval(pendTimer);
+  try{localStorage.removeItem("pendId")}catch(e){}
+}
+async function checkPending(){
+  const id=$("empId").value.trim(); if(!id) return;
   try{
-    const d=await apiCall({action:"login",pin});
-    if(d.ok){
-      me={group:d.group||"",role:d.role||"edit",pin,person:d.person||{name:"",title:"",photo:""},dash:d.dash!==false,hv:!!d.hv};lastAct=Date.now();
-      $("backMain").hidden=!me.hv;
-      $("gate").hidden=true;
-      try{localStorage.setItem("hv3pin",pin)}catch(e){}
-      const t=pinTarget;pinTarget=null;
-      showWelcome(me.person);
-      await Promise.all([load(),sleep(4200)]);       // welcome stays on screen while the data loads
-      closePin();
-      toast("Welcome"+(me.person.name?", "+me.person.name:"")+(me.role==="admin"?" — admin: all groups":me.group?" — you can edit "+GROUPS[me.group].name:" — view only"));
-      if(me.hv&&!t){showEntry();return}
-      if(!me.dash){showEntry();return}
-      if(t&&main!==t)openMain(t);
-      if(!t)showEntry();
-      return;
+    const d=await apiCall({action:"state",id});
+    if(d.ok&&d.state==="pending") return;             // still waiting
+    hidePending();
+    if(d.state==="reset"||d.state==="change"){showForm("sform");$("sId").value=id;return}
+    $("msub").textContent=d.state==="active"?"Your account is active. Enter your password to continue":"Enter your EMPRESS ID and password";
+  }catch(e){}
+}
+async function reqGo(){
+  const id=$("sId").value.trim();
+  if(!id){$("spmsg").textContent="Enter your EMPRESS ID";return}
+  $("spmsg").textContent="Sending request…";
+  const d=await apiCall({action:"resetreq",id});
+  $("spmsg").textContent=d.ok?"Request sent. When the administrator approves, come back here and set a new password.":d.error;
+}
+function showForm(which){
+  ["lform","rform","sform"].forEach(f=>{$(f).hidden=(f!==which)});
+  $("sGo").disabled=false;$("sGo").textContent="Save password";$("regGo").disabled=false;$("regGo").textContent="Submit";
+}
+async function pinGo(){
+  const id=$("empId").value.trim(), pw=$("pinIn").value;
+  if(!id||!pw){$("pinmsg").textContent="Enter EMPRESS ID and password";return}
+  $("pinIn").value="";
+  $("pinGo").disabled=true;$("pinmsg").textContent="Checking…";
+  try{
+    const d=await apiCall({action:"login",id,password:pw});
+    if(d.ok){await enterWith(d,d.token);return}
+    if(d.status==="reset"||d.status==="change"){showForm("sform");$("sId").value=id;$("sPw").value="";$("sPw2").value="";$("spmsg").textContent=d.error}
+    else if(d.status==="new"){showForm("rform");$("rId").value=id;$("regmsg").textContent="";lookupId()}
+    else if(d.status==="pending"){showPending(id)}
+    else{
+      $("pinmsg").textContent=d.error||"Login failed";
+      const c=$("mcard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");$("pinIn").select();
     }
-    $("pinmsg").textContent="Wrong password";
-    const c=$("mcard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");$("pinIn").select();
-  }catch(e){$("pinmsg").textContent="Could not check password ("+e.message+")"}
+  }catch(e){$("pinmsg").textContent="Could not check (" + e.message + ")"}
   $("pinGo").disabled=false;
 }
+async function lookupId(){
+  const id=$("rId").value.trim(); if(!id) return;
+  const d=await apiCall({action:"lookup",id});
+  if(!d.ok){$("regmsg").textContent=d.error;$("rWho").textContent="";$("rNew").hidden=true;return}
+  $("regmsg").textContent="";
+  if(d.known){$("rWho").textContent=d.name+" · "+d.desig;$("rNew").hidden=true}
+  else{$("rWho").textContent="This ID is not in the list. Please register as a new user.";$("rNew").hidden=false}
+}
+function clearRegister(){
+  ["rId","rName","rDesig","rMobile","rPw","rPw2"].forEach(i=>$(i).value="");
+  $("rWho").textContent="";$("rNew").hidden=true;
+  ["rPw","rPw2"].forEach(i=>{$(i).type="password"});
+}
+async function regGo(){
+  const v=i=>$(i).value.trim();
+  const payload={action:"register",id:v("rId"),name:v("rName"),desig:v("rDesig"),mobile:v("rMobile"),password:$("rPw").value,confirm:$("rPw2").value};
+  const btn=$("regGo"); btn.disabled=true; btn.textContent="Submitting…"; $("regmsg").textContent="Please wait…";
+  clearRegister();                                          // the details are removed as soon as the request is sent
+  try{
+    const d=await apiCall(payload);
+    if(d.ok){ if(d.status==="active"){showForm("lform");$("msub").textContent="Registration complete. Please log in."} else showPending(payload.id); }
+    else $("regmsg").textContent=d.error;
+  }catch(e){$("regmsg").textContent="Could not submit. Please try again."}
+  btn.disabled=false; btn.textContent="Submit";
+}
+async function setGo(){
+  const payload={action:"setpw",id:$("sId").value.trim(),password:$("sPw").value,confirm:$("sPw2").value};
+  const btn=$("sGo"); btn.disabled=true; btn.textContent="Saving…"; $("spmsg").textContent="Please wait…";
+  $("sId").value="";$("sPw").value="";$("sPw2").value="";$("sPw").type="password";$("sPw2").type="password";
+  try{
+    const d=await apiCall(payload);
+    if(d.ok){$("spmsg").textContent="Password saved. Logging you in…";await enterWith(d,d.token);return}
+    $("spmsg").textContent=d.error;
+  }catch(e){$("spmsg").textContent="Could not save. Please try again."}
+  btn.disabled=false; btn.textContent="Save password";
+}
+async function openAdmin(){
+  $("adm").hidden=false;$("admList").textContent="…";
+  const d=await apiCall({action:"admin",op:"list",pin:me.pin});
+  if(!d.ok){$("admList").textContent=d.error;return}
+  const label={pending:"অপেক্ষমাণ",active:"অনুমোদিত",reset:"রিসেট: নতুন পাসওয়ার্ড বাকি",rejected:"বাতিল"};
+  $("admList").textContent="";
+  if(!d.users.length){$("admList").textContent="এখনো কোনো রেজিস্ট্রেশন নেই";return}
+  d.users.forEach(u=>{
+    const row=document.createElement("div");row.className="arow";
+    const info=document.createElement("div");info.className="ainfo";
+    const b=document.createElement("b");b.textContent=u.name||"—";
+    const sp=document.createElement("span");sp.textContent=u.id+" · "+(u.desig||"")+" · "+(u.mobile||"");
+    const sm=document.createElement("small");sm.textContent=label[u.status]||u.status;
+    info.append(b,sp,sm);
+    const btns=document.createElement("div");btns.className="abtns";
+    const add=(t,op)=>{const x=document.createElement("button");x.textContent=t;x.onclick=()=>admAct(op,u.id);btns.appendChild(x)};
+    if(u.status==="pending"){add("Approve","approve");add("Reject","reject")}
+    else if(u.status==="active"){add("Reset password","reset")}
+    else if(u.status==="rejected"){add("Approve","approve")}
+    row.append(info,btns);$("admList").appendChild(row);
+  });
+}
+async function admAct(op,uid){await apiCall({action:"admin",op,uid,pin:me.pin});openAdmin()}
 const canEdit=r=>needPin?(!!me&&(me.role==="admin"||(!!me.group&&r.g===me.group))):(!!sub&&r.g===sub);
 const bagLabel=r=>/[A-Za-z]/.test(String(r.bagTxt||""))?String(r.bagTxt).trim():(r.bag+" bag");
 function renderHeader(){
@@ -964,7 +1132,7 @@ $("q").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();re
 setRows([]);render();
 (function(){let sp="";try{sp=localStorage.getItem("hv3pin")||""}catch(e){}
   if(!sp){load();return}
-  $("pinIn").value=sp; pinGo().then(()=>{if(!me)askPin(null)});
+  apiCall({action:"me",pin:sp}).then(d=>{if(d.ok){enterWith(d,sp)}else{try{localStorage.removeItem("hv3pin")}catch(e){};askPin(null)}}).catch(()=>askPin(null));
 })();
 // pick up changes made directly in the Google Sheet: every REFRESH_SECONDS, when the page is on screen,
 // and straight away when you come back to the page. Never while someone is typing or saving.
@@ -982,7 +1150,7 @@ window.addEventListener("online",refreshQuiet);
 /* ---- Entry screen: choose the handover interface or the dashboard ---- */
 function showEntry(){
   if(!me)return;
-  $("eHv").hidden=!me.hv; $("eDash").hidden=!me.dash;
+  $("eHv").hidden=!me.hv; $("eDash").hidden=!me.dash; $("eAdm").hidden=!me.approver;
   if(!me.dash){openHV();return}
   if(!me.hv){$("entry").hidden=true;return}
   $("entry").hidden=false;
@@ -1009,13 +1177,22 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("eDash").onclick=()=>{$("entry").hidden=true};
   $("backMain").onclick=openEntry;
   startSlides();
+  $("goReg").onclick=e=>{e.preventDefault();showForm("rform")};
+  $("goSet").onclick=e=>{e.preventDefault();showForm("sform")};
+  document.querySelectorAll(".authlinks .back").forEach(x=>x.onclick=e=>{e.preventDefault();showForm("lform")});
+  $("regGo").onclick=regGo; $("sGo").onclick=setGo; $("sRq").onclick=reqGo; $("rId").addEventListener("change",lookupId);
+  $("eAdm").onclick=openAdmin; $("admClose").onclick=()=>{$("adm").hidden=true};
+  document.querySelectorAll(".eye[data-for]").forEach(b=>b.onclick=()=>{const i=$(b.dataset.for),show=i.type==="password";i.type=show?"text":"password";b.classList.toggle("on",show)});
+  $("empId").addEventListener("keydown",e=>{if(e.key==="Enter")$("pinIn").focus()});
   $("pwEye").onclick=()=>{const i=$("pinIn"),show=i.type==="password";i.type=show?"text":"password";$("pwEye").classList.toggle("on",show)};
 });
 </script>
 <div id="entry" class="entry" hidden><div class="etiles">
   <button class="etile" id="eHv" hidden><span class="eico"><svg viewBox="0 0 24 24"><path d="M2.5 6.5h11v9h-11zM13.5 9.5h4l3.5 3.5v2.5h-7.5"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span><b>Handover</b><small>Vehicle transfer</small></button>
   <button class="etile" id="eDash" hidden><span class="eico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg></span><b>Data</b><small>Driver &amp; vehicle info</small></button>
+  <button class="etile" id="eAdm" hidden><span class="eico"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><b>Approvals</b><small>Registrations</small></button>
 </div></div>
+<div id="adm" hidden><div class="admcard"><div class="admhead"><b>Registrations</b><button id="admClose" class="admx">Close</button></div><div id="admList"></div></div></div>
 <div id="hvbox" hidden><iframe id="hvf" title="বদলি ড্রাইভার ইন্টারফেস"></iframe></div>
 <script type="text/plain" id="hvsrc"><!DOCTYPE html>
 <html lang="bn">
@@ -1323,7 +1500,7 @@ function renderDV(){
 }
 function checkRole(){
   if(!PIN)return;
-  jsonp({action:"login",pin:PIN}).then(r=>{
+  jsonp({action:"me",pin:PIN}).then(r=>{
     ROLE=(r&&r.role)||"";
     if(ROLE==="view"){document.body.classList.add("vo");renderDV()}
   }).catch(()=>{});
