@@ -449,10 +449,10 @@ td[data-l="Helper Mobile"]{order:12}
 .etile[hidden]{display:none}
 /* ===== welcome name on one line, waiting screen, reset request button ===== */
 .welcome h2{white-space:nowrap!important;font-size:clamp(20px,7vw,40px)!important}
-.pendbox{text-align:center;padding:10px 4px 6px}
+.pendbox{text-align:center;padding:10px 4px 6px;background:rgba(20,12,50,.45);border-radius:16px;margin-top:6px;text-shadow:0 2px 10px rgba(0,0,0,.8)}
 .pendh{font-size:clamp(22px,6.5vw,30px);font-weight:800;color:#fff;margin:6px 0}
-.pendt{font-size:17px;color:#fff;margin:4px 0 0;font-weight:600}
-.pendc{font-size:15px;color:#e6e2ff;margin:14px 0 0}
+.pendt{font-size:17px;color:#fff;margin:4px 0 0;font-weight:700}
+.pendc{font-size:16px;color:#fff;margin:14px 0 0}
 .pendspin{width:44px;height:44px;margin:0 auto 14px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spinr 1s linear infinite}
 .modal.login [hidden]{display:none!important}
 .reqbtn{display:block;width:100%;margin-top:10px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font:inherit;font-weight:700;cursor:pointer}
@@ -545,13 +545,26 @@ td[data-l="Helper Mobile"]{order:12}
         <div class="authlinks"><a class="back">← Back to login</a></div>
       </div>
       <div id="sform" hidden>
-        <h2>Forgot Password</h2>
-        <p class="sub">Forgot your password? Send a request. After approval, set a new password here.</p>
-        <div class="pwbox"><input id="sId" type="text" inputmode="numeric" placeholder="EMPRESS ID"></div>
-        <div class="pwbox"><input id="sPw" type="password" placeholder="New password (min 6)" autocomplete="new-password"><button type="button" class="eye" data-for="sPw" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
-        <div class="pwbox"><input id="sPw2" type="password" placeholder="Conform password" autocomplete="new-password"><button type="button" class="eye" data-for="sPw2" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
-        <button id="sGo" class="loginbtn">Save password</button>
-        <button id="sRq" class="reqbtn" type="button">Request password reset</button>
+        <div id="sStep1">
+          <h2>Forgot Password</h2>
+          <p class="sub">Enter your EMPRESS ID and send a request to the administrator.</p>
+          <div class="pwbox"><input id="rqId" type="text" inputmode="numeric" placeholder="EMPRESS ID" aria-label="EMPRESS ID"></div>
+          <button id="sRq" class="reqbtn" type="button">Request password reset</button>
+        </div>
+        <div id="sWait" class="pendbox" hidden>
+          <div class="pendspin"></div>
+          <h2 class="pendh">Request sent.</h2>
+          <p class="pendt">Please wait for administrator approval.</p>
+          <p class="pendc">Thank you for waiting. For urgent needs, call <b>01719-478044</b>.</p>
+        </div>
+        <div id="sStep2" hidden>
+          <h2>Set new password</h2>
+          <p class="sub">The administrator has approved your request.</p>
+          <div class="pwbox"><input id="sId" type="text" inputmode="numeric" placeholder="EMPRESS ID" aria-label="EMPRESS ID"></div>
+          <div class="pwbox"><input id="sPw" type="password" placeholder="New password (min 6)" autocomplete="new-password"><button type="button" class="eye" data-for="sPw" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
+          <div class="pwbox"><input id="sPw2" type="password" placeholder="Conform password" autocomplete="new-password"><button type="button" class="eye" data-for="sPw2" aria-label="Show or hide password"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M3 3l18 18"/></svg></button></div>
+          <button id="sGo" class="loginbtn">Save password</button>
+        </div>
         <div class="pinmsg" id="spmsg"></div>
         <div class="authlinks"><a class="back">← Back to login</a></div>
       </div>
@@ -778,7 +791,9 @@ function askPin(target){
   let pend="";try{pend=localStorage.getItem("pendId")||""}catch(e){}
   $("msub").textContent="Enter your password to continue";showForm("lform");$("welcome").hidden=true;$("mcard").classList.remove("plain");pickVerse();
   $("pinIn").value="";$("pinIn").type="password";$("adm").hidden=true;$("pwEye").classList.remove("on");$("pinmsg").textContent="";$("pinGo").disabled=false;$("modal").hidden=false;
+  let rst="";try{rst=localStorage.getItem("resetId")||""}catch(e){}
   if(pend){showPending(pend,true)}
+  else if(rst){showForgot("wait",rst);startResetWatch(rst);checkReset(rst)}
   setTimeout(()=>$("pinIn").focus(),50);
 }
 const closePin=()=>{if(needPin&&!me)return;$("modal").hidden=true};   // cannot be closed while locked
@@ -841,12 +856,62 @@ async function checkPending(){
     $("msub").textContent=d.state==="active"?"Your account is active. Enter your password to continue":"Enter your EMPRESS ID and password";
   }catch(e){}
 }
+function showForgot(stage,id){
+  showForm("sform");
+  $("sStep1").hidden=stage!=="ask"; $("sWait").hidden=stage!=="wait"; $("sStep2").hidden=stage!=="set";
+  $("sRq").disabled=false;
+  if(stage==="ask"){$("rqId").value=id||""}
+  if(stage==="set"){$("sId").value=id||""}
+  $("spmsg").textContent="";
+}
+let resetTimer=null;
+function startResetWatch(id){
+  clearInterval(resetTimer); resetTimer=setInterval(()=>checkReset(id),15000);
+}
+async function checkReset(id){
+  try{
+    const d=await apiCall({action:"state",id});
+    if(d.state==="requested") return;                              // still waiting
+    if(d.state==="reset"||d.state==="change"){
+      clearInterval(resetTimer); showForgot("set",id);
+      $("spmsg").textContent="Approved. Enter your new password.";
+      return;
+    }
+    clearInterval(resetTimer);
+    try{localStorage.removeItem("resetId")}catch(e){}
+    showForm("lform");
+    $("msub").textContent=d.state==="active"?"Your password is ready. Please log in.":"Enter your EMPRESS ID and password";
+  }catch(e){}
+}
 async function reqGo(){
-  const id=$("sId").value.trim();
+  const id=$("rqId").value.trim();
   if(!id){$("spmsg").textContent="Enter your EMPRESS ID";return}
-  $("spmsg").textContent="Sending request…";
-  const d=await apiCall({action:"resetreq",id});
-  $("spmsg").textContent=d.ok?"Request sent. When the administrator approves, come back here and set a new password.":d.error;
+  const btn=$("sRq"); btn.disabled=true; $("spmsg").textContent="Sending request…";
+  try{
+    const d=await apiCall({action:"resetreq",id});
+    if(!d.ok){$("spmsg").textContent=d.error||"Request failed. Please try again.";btn.disabled=false;return}
+    try{localStorage.setItem("resetId",id)}catch(e){}
+    if(d.status==="reset"){showForgot("set",id);return}
+    showForgot("wait",id); startResetWatch(id);
+  }catch(e){
+    $("spmsg").textContent="Could not reach the server. Check your internet connection and press the button again.";
+    btn.disabled=false;
+  }
+}
+async function setGo(){
+  const pw=$("sPw").value;
+  const payload={action:"setpw",id:$("sId").value.trim(),password:pw,confirm:$("sPw2").value};
+  const btn=$("sGo"); btn.disabled=true; btn.textContent="Saving…"; $("spmsg").textContent="Please wait…";
+  $("sPw").value="";$("sPw2").value="";$("sPw").type="password";$("sPw2").type="password";
+  try{
+    const d=await apiCall(payload);
+    if(d.ok){
+      try{localStorage.removeItem("resetId")}catch(e){}
+      $("spmsg").textContent="Password saved. Logging you in…";await enterWith(d,d.token);return;
+    }
+    $("spmsg").textContent=d.error;
+  }catch(e){$("spmsg").textContent="Could not save. Please try again."}
+  btn.disabled=false; btn.textContent="Save password";
 }
 function showForm(which){
   ["lform","rform","sform"].forEach(f=>{$(f).hidden=(f!==which)});
@@ -860,7 +925,8 @@ async function pinGo(){
   try{
     const d=await apiCall({action:"login",id,password:pw});
     if(d.ok){await enterWith(d,d.token);return}
-    if(d.status==="reset"||d.status==="change"){showForm("sform");$("sId").value=id;$("sPw").value="";$("sPw2").value="";$("spmsg").textContent=d.error}
+    if(d.status==="reset"||d.status==="change"){showForgot("set",id);$("spmsg").textContent=d.error}
+    else if(d.status==="requested"){showForgot("wait",id);startResetWatch(id)}
     else if(d.status==="new"){showForm("rform");$("rId").value=id;$("regmsg").textContent="";lookupId()}
     else if(d.status==="pending"){showPending(id)}
     else{
@@ -894,17 +960,6 @@ async function regGo(){
     else $("regmsg").textContent=d.error;
   }catch(e){$("regmsg").textContent="Could not submit. Please try again."}
   btn.disabled=false; btn.textContent="Submit";
-}
-async function setGo(){
-  const payload={action:"setpw",id:$("sId").value.trim(),password:$("sPw").value,confirm:$("sPw2").value};
-  const btn=$("sGo"); btn.disabled=true; btn.textContent="Saving…"; $("spmsg").textContent="Please wait…";
-  $("sId").value="";$("sPw").value="";$("sPw2").value="";$("sPw").type="password";$("sPw2").type="password";
-  try{
-    const d=await apiCall(payload);
-    if(d.ok){$("spmsg").textContent="Password saved. Logging you in…";await enterWith(d,d.token);return}
-    $("spmsg").textContent=d.error;
-  }catch(e){$("spmsg").textContent="Could not save. Please try again."}
-  btn.disabled=false; btn.textContent="Save password";
 }
 async function openAdmin(){
   $("adm").hidden=false;$("admList").textContent="…";
@@ -1178,7 +1233,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("backMain").onclick=openEntry;
   startSlides();
   $("goReg").onclick=e=>{e.preventDefault();showForm("rform")};
-  $("goSet").onclick=e=>{e.preventDefault();showForm("sform")};
+  $("goSet").onclick=e=>{e.preventDefault();showForgot("ask","")};
   document.querySelectorAll(".authlinks .back").forEach(x=>x.onclick=e=>{e.preventDefault();showForm("lform")});
   $("regGo").onclick=regGo; $("sGo").onclick=setGo; $("sRq").onclick=reqGo; $("rId").addEventListener("change",lookupId);
   $("eAdm").onclick=openAdmin; $("admClose").onclick=()=>{$("adm").hidden=true};
@@ -1570,7 +1625,11 @@ function vLook(){
 }
 function rLook(){
   const k=key(E.rc.value);let d=null;
-  if(k){const num=k.replace(/^[A-Z]*/,"");if(num)d=D.drivers.find(x=>key(x.c).replace(/^[A-Z]*/,"")===num)||null}
+  if(k){
+    const letters=k.replace(/\d+$/,""), num=k.replace(/^[A-Z]*/,"");
+    if(letters){d=D.drivers.find(x=>key(x.c)===k)||null}            // CD0976 and D0976 are different drivers
+    else if(num){const hits=D.drivers.filter(x=>key(x.c).replace(/^[A-Z]*/,"")===num);d=hits.length===1?hits[0]:null}
+  }
   if(d){E.rn.value=d.n;E.rc.value=d.c.replace(/^([A-Z]+)(\d+)$/i,"$1-$2").toUpperCase();ra=true}else if(ra){E.rn.value="";ra=false}
 }
 
