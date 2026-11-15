@@ -343,6 +343,23 @@ body.locked #total,body.locked #mains,body.locked #subs,body.locked .bar,body.lo
 td[data-l="Helper Code"]{order:13}
 td[data-l="Helper Name"]{order:11}
 td[data-l="Helper Mobile"]{order:12}
+/* ===== phone card layout (same as the reference card): EMPRESS ID and joining date added, order fixed ===== */
+@media (max-width:760px){
+  td[data-l="Driver Name"]{order:2}
+  td[data-l="EMPRESS ID"]{order:3;font-weight:600}
+  td[data-l="Date of Joining"]{order:4;font-weight:600}
+  td[data-l="Location"]{order:5}
+  td[data-l="Sub Location"]{order:6}
+  td[data-l="Capacity"]{order:7}
+  td[data-l="Phone Number"]{order:8}
+  td[data-l="Code No"]{order:9}
+  td[data-l="Vendor Code"]{order:10}
+  td[data-l="Status"]{order:11}
+  td[data-l="Helper Name"]{order:12}
+  td[data-l="Helper Mobile"]{order:13}
+  td[data-l="Helper Code"]{order:14}
+  td[data-l="EMPRESS ID"],td[data-l="Date of Joining"]{font-size:22px}
+}
 @media (max-width:760px){tbody tr td[data-l="Driver Name"]{color:#1d4ed8!important;background:none!important;font-weight:800}}
 .chip i.shrt{display:inline-block!important;white-space:nowrap;font-style:normal;font-size:13px;font-weight:800;color:#b91c1c;background:rgba(220,38,38,.12);padding:0 8px;border-radius:99px;margin-left:2px}
 .chip.on i.shrt{background:rgba(255,255,255,.25);color:#fff}
