@@ -21,7 +21,7 @@
 body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif;padding:14px 10px 30px;
   background:radial-gradient(900px 400px at 10% -10%,rgba(109,93,252,.22),transparent 60%),radial-gradient(800px 400px at 100% 0,rgba(236,72,153,.16),transparent 60%),var(--bg)}
 .shell{max-width:1600px;margin:0 auto}
-@media (min-width:761px){body{padding:22px clamp(20px,5vw,90px) 40px}}
+@media (min-width:761px){body{padding:22px clamp(10px,1.2vw,22px) 40px}}
 header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:20px;animation:drop .6s cubic-bezier(.2,.8,.2,1) both}
 .hright{justify-self:end;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .hperson{justify-self:center;display:flex;align-items:center;gap:12px;background:var(--card);padding:6px 20px 6px 8px;border-radius:99px;box-shadow:var(--shadow);animation:pop .4s both}
@@ -106,8 +106,10 @@ h1{margin:0;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;font-weight:800
 /* table */
 .wrap{overflow:auto;max-height:calc(100vh - 110px);min-height:260px;background:var(--card);border-radius:18px;box-shadow:var(--shadow);animation:drop .6s .4s both}
 table{border-collapse:collapse;width:100%}
-th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.08);background:linear-gradient(135deg,#5b4bd8,#8b5cf6);color:#fff;padding:10px 6px;font-size:12.5px;font-weight:700;text-align:center}
-td{padding:7px 6px;text-align:center;border-top:1px solid var(--line);font-size:14px;overflow-wrap:anywhere}
+th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.08);background:linear-gradient(135deg,#5b4bd8,#8b5cf6);color:#fff;padding:10px 4px;font-size:12.5px;font-weight:700;text-align:center}
+td{padding:7px 4px;text-align:center;border-top:1px solid var(--line);font-size:14px;overflow-wrap:anywhere}
+/* helper mobile number always on one line */
+td:last-child{white-space:nowrap}
 td:nth-child(2){white-space:nowrap;overflow-wrap:normal}
 td.l{text-align:left}
 tbody tr{animation:rowIn .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*26ms);transition:background .2s}
@@ -349,7 +351,7 @@ td[data-l="Helper Mobile"]{order:12}
   tbody tr td{white-space:nowrap!important}
   tbody tr td[data-l="Vehicle No."] .gtxt{display:none!important}
   thead th:nth-child(8),tbody tr td:nth-child(8),
-  thead th:nth-child(12),tbody tr td:nth-child(12){display:none!important}
+  thead th:nth-child(14),tbody tr td:nth-child(14){display:none!important}
 }
 /* ===== login page: slideshow background, glass card, welcome ===== */
 .modal.login{display:block;background:#0b0a1f;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:auto;animation:none}
@@ -497,7 +499,7 @@ td[data-l="Helper Mobile"]{order:12}
   </div>
 
   <div class="wrap"><table>
-    <thead><tr><th>Sl.No.</th><th>Vehicle No.</th><th>Location</th><th>Category</th><th>Capacity</th><th>Sub Location</th><th>Bag</th><th>Group</th><th>Driver Name</th><th>Code No</th><th>Phone Number</th><th>Vendor Code</th><th>Status</th><th>Helper Code</th><th>Helper Name</th><th>Helper Mobile</th></tr></thead>
+    <thead><tr><th>Sl.No.</th><th>Vehicle No.</th><th>Location</th><th>Category</th><th>Capacity</th><th>Sub Location</th><th>Bag</th><th>Group</th><th>Driver Name</th><th>EMPRESS ID</th><th>Date of Joining</th><th>Code No</th><th>Phone Number</th><th>Vendor Code</th><th>Status</th><th>Helper Code</th><th>Helper Name</th><th>Helper Mobile</th></tr></thead>
     <tbody id="body"></tbody>
   </table></div>
   <footer class="credit" id="credit"></footer>
@@ -1002,7 +1004,7 @@ function renderHeader(){
     }catch(err){toast("Photo not saved: "+err.message,true)}
   };
 }
-const LBL=["Sl.No.","Vehicle No.","Location","Category","Capacity","Sub Location","Bag","Group","Driver Name","Code No","Phone Number","Vendor Code","Status","Helper Code","Helper Name","Helper Mobile"];
+const LBL=["Sl.No.","Vehicle No.","Location","Category","Capacity","Sub Location","Bag","Group","Driver Name","EMPRESS ID","Date of Joining","Code No","Phone Number","Vendor Code","Status","Helper Code","Helper Name","Helper Mobile"];
 const statusPill=t=>{t=String(t||"").trim();if(!t)return '<span class="dash">—</span>';let h=0;for(const ch of t.toLowerCase())h=(h*31+ch.charCodeAt(0))%360;return '<span class="st" style="--h:'+h+'">'+esc(t)+'</span>'};
 const tdh=(i,inner,cls,extra)=>'<td data-l="'+LBL[i]+'"'+(cls?' class="'+cls+'"':'')+(extra||'')+'>'+inner+'</td>';
 
@@ -1043,10 +1045,11 @@ function render(){
     tr.innerHTML=tdh(0,n+1)+tdh(1,'<b class="vno">'+esc(r.v)+'</b><span class="vcat">'+esc(r.cat)+'</span><span class="gtxt" style="color:'+GROUPS[r.g].color+'">'+GROUPS[r.g].name+'</span><span class="vbag">'+bagLabel(r)+'</span>')+tdh(2,esc(r.loc))+tdh(3,esc(r.cat))+tdh(4,esc(r.cap))+tdh(5,esc(r.sub))+tdh(6,bagLabel(r))
       +tdh(7,'<span class="gtxt" style="color:'+GROUPS[r.g].color+'">'+GROUPS[r.g].name+'</span>')
       +tdh(8,esc(r.name),"l"," data-name")
-      +(ed?ec(9,"code"):tdh(9,esc(r.code)))
-      +(ed?ec(10,"phone"):tdh(10,esc(fmtPhone(r.phone))))
-      +(ed?ec(11,"vendor"):tdh(11,esc(r.vendor)))
-      +tdh(12,statusPill(r.status))+tdh(13,esc(r.hcode))+tdh(14,esc(r.hname))+tdh(15,esc(fmtPhone(r.hphone)));
+      +tdh(9,esc(r.empress))+tdh(10,esc(r.join))
+      +(ed?ec(11,"code"):tdh(11,esc(r.code)))
+      +(ed?ec(12,"phone"):tdh(12,esc(fmtPhone(r.phone))))
+      +(ed?ec(13,"vendor"):tdh(13,esc(r.vendor)))
+      +tdh(14,statusPill(r.status))+tdh(15,esc(r.hcode))+tdh(16,esc(r.hname))+tdh(17,esc(fmtPhone(r.hphone)));
     tr.dataset.v=r.v;
     if(ed){   // nothing is editable until you click the exact cell you want to change
       tr.addEventListener("click",e=>{const td=e.target.closest("td.ec");if(td)startEdit(tr,td,r)});
@@ -1558,6 +1561,27 @@ body{display:flex;flex-direction:column;min-height:100%}
   .bar{padding-top:6px!important;padding-bottom:6px!important}
   .hvfoot{font-size:11px!important;padding-top:6px!important}
 }
+
+/* ===== FIX: phone data cards in one column; name and phone stay on one line ===== */
+@media (max-width:760px),(pointer:coarse) and (max-device-width:760px){
+  #dview{padding:12px 10px 30px}
+  #dview .dv-head{flex-direction:column;align-items:flex-start;gap:8px}
+  #dview .dv-right{width:100%;justify-content:space-between}
+  #dview .dv-right .dv-btn{flex:1 1 auto;padding:8px 10px;font-size:12.5px}
+  #dview .dv-bar{gap:8px}
+  #dview .dv-tabs{width:100%}
+  #dview .dv-tabs button{flex:1}
+  #dview .dv-search{flex:1 1 100%;font-size:16px;width:100%}
+  #dview .dv-count{margin-left:0}
+  #dview .dv-cards{grid-template-columns:1fr!important;gap:10px}
+  #dview .dv-card{padding:12px 14px}
+  #dview .dv-top{font-size:17px}
+  #dview .dv-row{font-size:15px}
+  #dview .dv-row small{font-size:13px}
+  .pb{min-width:0;max-width:100%}
+  .pb b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-size:clamp(17px,5.6vw,24px)!important;line-height:1.25}
+  .pb span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-size:clamp(13px,4.2vw,17px)!important}
+}
 </style>
 <script>
 (function(){try{
@@ -1685,7 +1709,7 @@ function renderDV(){
     const rows=raw.filter(r=>!q||Object.values(r).join(" ").toLowerCase().indexOf(q)>=0);
     cnt=rows.length;
     html=rows.map(r=>'<div class="dv-card" style="--g:'+(GCOL[r.g]||"#6d5dfc")+'"><div class="dv-top"><b>'+esc(r.v)+'</b><span class="dv-grp">'+esc(r.g)+'</span></div>'+
-      row("ড্রাইভার",r.name)+row("কোড",r.code)+row("মোবাইল",r.phone)+row("লোকেশন",r.loc)+row("Sub location",r.sub)+
+      row("ড্রাইভার",r.name)+row("কোড",r.code)+row("মোবাইল",r.phone)+row("ইমপ্রেস আইডি",r.empress)+row("যোগদান",r.join)+row("লোকেশন",r.loc)+row("Sub location",r.sub)+
       row("Category",r.cat)+row("Capacity",r.cap)+row("Bag",/[A-Za-z]/.test(String(r.bagTxt||""))?String(r.bagTxt).trim():r.bag)+row("Vendor",r.vendor)+row("Status",r.status)+row("Helper Code",r.hcode)+row("Helper Name",r.hname)+row("Helper Mobile",r.hphone)+'</div>').join("");
   } else {
     const rows=Object.keys(drv).sort().map(k=>({c:k,n:drv[k]})).filter(r=>!q||(r.c+" "+r.n).toLowerCase().indexOf(q)>=0);
@@ -1755,7 +1779,7 @@ function load(){
       return askLogin(PIN?"PIN ভুল — আবার দিন":"").then(()=>load());
     }
     if(!(j.ok&&j.vehicles))throw 0;
-    const d={vehicles:j.vehicles.filter(x=>x.v&&x.name).map(x=>({v:x.v,n:x.name,c:x.code,m:x.phone})),
+    const d={vehicles:j.vehicles.filter(x=>x.v&&x.name).map(x=>({v:x.v,n:x.name,c:x.code,m:x.phone,e:x.empress,j:x.join})),
              drivers:Object.keys(j.drivers||{}).map(k=>({c:k,n:j.drivers[k]})),pr:j.pinRequired,raw:j.vehicles,drv:j.drivers||{},xc:j.extraCols||[]};
     D=d;try{store.set("hv3",JSON.stringify(d))}catch(e){}
     E.ds.textContent="";vLook();rLook();build();checkRole();return "ok";
@@ -1782,7 +1806,7 @@ function chip(el,t,c){el.textContent=t;el.className="chip "+c;el.hidden=!t}
 let nhOn=false;
 function build(){
   const wk=E.t3.checked,hasV=L.length>0||/^\d{2}-\d{4}$/.test(E.veh.value.trim()),d=L[li],rc=R.filter(has).length,need=[];
-  E.pb.innerHTML=d?"<b>"+esc(d.n)+"</b><span>"+esc(d.c)+(d.m?" · "+esc(mob(d.m)):"")+"</span>"
+  E.pb.innerHTML=d?"<b>"+esc(d.n)+"</b><span>"+esc(d.c)+(d.m&&/\d{7}/.test(d.m)?" · "+esc(mob(d.m)):"")+"</span>"
     :hasV?"<b class='co'>"+CONFIG.COMPANY+"</b><span>ড্রাইভারের তথ্য নেই</span>":"<span>গাড়ি নম্বর লিখুন</span>";
   if(!d||wk)nhOn=false;
   E.nh.hidden=!d||wk;E.nh.classList.toggle("on",nhOn);E.nh.textContent=(nhOn?"✓ ":"")+"বুঝিয়ে দেয়নি";
