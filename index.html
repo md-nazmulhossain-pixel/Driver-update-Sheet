@@ -980,33 +980,142 @@ html.theme-grey .intT tbody tr.vred td{background-color:#7f1d1d!important;color:
 }
 </style>
 <style>
-/* ===== Vehicle Status: chips on their own row, wrapping; coloured selected chip; count on the selected chip ===== */
+/* ===== Vehicle Status: five buttons in one line; liquid highlight; solid sub-status panel ===== */
 #ipExtra{order:3;flex:1 1 100%;min-width:0;display:flex;justify-content:center}
-.vstChips{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;padding:5px;border-radius:22px;max-width:100%;
-  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.08));
+.vstChips{position:relative;display:flex;flex-wrap:nowrap;justify-content:center;gap:8px;padding:6px;border-radius:20px;width:100%;max-width:1000px;box-sizing:border-box;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
   backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);
-  border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 28px rgba(0,0,0,.18)}
-.vstInd{position:absolute;top:0;left:0;width:0;height:0;border-radius:999px;pointer-events:none;
-  background:#e11d48;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 18px rgba(225,29,72,.35);
-  transition:transform .6s cubic-bezier(.34,1.56,.64,1),width .6s cubic-bezier(.34,1.56,.64,1),height .6s cubic-bezier(.34,1.56,.64,1)}
-.vstChip{position:relative;z-index:1;flex:none;display:inline-flex;align-items:center;border:0;background:transparent;color:#e5e7eb;padding:8px 14px;border-radius:999px;
-  font:inherit;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;
-  transition:color .4s ease,transform .35s cubic-bezier(.34,1.56,.64,1)}
-.vstChip:hover{transform:translateY(-1px)}
-.vstChip:active{transform:scale(.96)}
-.vstChip.on{color:#ffffff}
-.vstChip:focus-visible{outline:2px solid #e11d48;outline-offset:2px}
-.vstCnt{display:inline-flex;align-items:center;justify-content:center;height:20px;max-width:0;margin-left:0;padding:0;overflow:hidden;opacity:0;
-  border-radius:999px;background:rgba(255,255,255,.28);font-size:11px;font-weight:800;color:#ffffff;
-  transition:opacity .3s}
-.vstChip.on .vstCnt{max-width:70px;margin-left:8px;padding:0 8px;opacity:1}
-html:not(.theme-grey) .vstChip{color:#374151}
-html:not(.theme-grey) .vstChip.on{color:#ffffff}
-html:not(.theme-grey) .vstChips{background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.55));border-color:rgba(15,23,42,.1)}
+  border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px rgba(0,0,0,.18)}
+.vstInd{position:absolute;top:0;left:0;width:0;height:0;border-radius:999px;pointer-events:none;z-index:0;
+  background:linear-gradient(180deg,#f43f5e,#e11d48);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px rgba(225,29,72,.35);
+  transition:transform .55s cubic-bezier(.22,1,.36,1),width .55s cubic-bezier(.22,1,.36,1),height .55s cubic-bezier(.22,1,.36,1)}
+.vstInd.go{animation:indStretch .55s cubic-bezier(.22,1,.36,1)}
+@keyframes indStretch{0%{filter:blur(0)}40%{filter:blur(1.5px)}100%{filter:blur(0)}}
+.vstCatWrap{position:relative;flex:1 1 0;min-width:0;max-width:200px;display:flex}
+.vstCat{position:relative;z-index:1;width:100%;height:36px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.07);color:#e5e7eb;padding:0 10px;border-radius:999px;font:inherit;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:color .4s ease,transform .35s cubic-bezier(.22,1,.36,1),border-color .4s,background .4s}
+.vstCat:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.3)}
+.vstCat:active{transform:scale(.97)}
+.vstCat.on{color:#ffffff;border-color:transparent;background:transparent}
+.vstCat:focus-visible,.vstSubChip:focus-visible{outline:2px solid #e11d48;outline-offset:2px}
+.vstIc{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--ic,#e5e7eb);background:rgba(255,255,255,.1);transition:color .4s,background .4s}
+.vstIc svg{width:12px;height:12px}
+.vstCat.on .vstIc{color:#ffffff;background:rgba(255,255,255,.22);animation:icPop .6s cubic-bezier(.22,1,.36,1)}
+@keyframes icPop{0%{transform:scale(.7) rotate(-12deg)}60%{transform:scale(1.12) rotate(4deg)}100%{transform:scale(1) rotate(0)}}
+.vstTxt{overflow:hidden;text-overflow:ellipsis}
+.vstCnt{display:inline-flex;align-items:center;justify-content:center;height:18px;min-width:0;padding:0 7px;border-radius:999px;background:rgba(255,255,255,.28);font-size:10px;font-weight:800;color:#ffffff;flex:none}
+.vstCnt:empty{display:none}
+/* the sub-status panel: solid, so the data behind it does not show through */
+.vstSub{position:absolute;top:calc(100% + 10px);left:50%;z-index:60;min-width:240px;padding:8px;border-radius:16px;display:flex;flex-direction:column;gap:5px;transform-origin:50% 0;
+  background:rgba(31,41,55,.96);border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 40px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transform:translate(-50%,-6px) scale(.96);transition:opacity .25s,transform .4s cubic-bezier(.22,1,.36,1)}
+.vstSub::before{content:"";position:absolute;left:0;right:0;top:-12px;height:12px}
+.vstCatWrap:hover .vstSub,.vstCatWrap.open .vstSub{opacity:1;pointer-events:auto;transform:translate(-50%,0) scale(1)}
+.vstCatWrap.picked .vstSub{opacity:0!important;pointer-events:none!important;transform:translate(-50%,-6px) scaleY(.15)!important;transform-origin:50% 0}
+.vstSubChip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#e5e7eb;
+  padding:7px 12px;border-radius:999px;font:inherit;font-size:13px;font-weight:600;text-align:left;cursor:pointer;white-space:nowrap;transition:background .3s,color .3s,transform .3s}
+.vstSubChip:hover{background:rgba(255,255,255,.18);transform:translateX(2px)}
+.vstSubChip.on{background:#e11d48;border-color:transparent;color:#ffffff}
+.vstCatWrap:hover .vstSubChip,.vstCatWrap.open .vstSubChip{animation:vstIn .4s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*30ms + 30ms)}
+@keyframes vstIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.vstNone{font-size:13px;color:#e5e7eb;padding:6px 8px;opacity:.8}
+html:not(.theme-grey) .vstCat{color:#374151;background:rgba(255,255,255,.75);border-color:rgba(15,23,42,.1)}
+html:not(.theme-grey) .vstCat.on{color:#ffffff}
+html:not(.theme-grey) .vstSubChip{color:#374151;background:#f3f4f6}
+html:not(.theme-grey) .vstSubChip.on{color:#ffffff}
+html:not(.theme-grey) .vstChips{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.6));border-color:rgba(15,23,42,.1)}
+html:not(.theme-grey) .vstSub{background:#ffffff;border-color:rgba(15,23,42,.12)}
+html:not(.theme-grey) .vstNone{color:#374151}
+/* phone: five buttons still in one line, icon hidden to make room */
 @media (max-width:760px){
   #ipExtra{order:3;flex:1 1 100%;justify-content:flex-start}
-  .vstChips{width:100%;justify-content:flex-start}
+  .vstChips{gap:4px;padding:4px}
+  .vstCat{height:32px;font-size:10.5px;padding:0 4px;gap:0}
+  .vstIc{display:none}
+  .vstSub{min-width:0;width:min(260px,92vw)}
+  #vstBody tr{display:grid!important;grid-template-columns:1fr 1fr!important;gap:4px 12px}
+  #vstBody td{display:block!important}
+  #vstBody td[data-l="SL. No."],#vstBody td[data-l="Vehicle Categories"],#vstBody td[data-l="Bag"],#vstBody td[data-l="Remarks"],#vstBody td.vempty,#vstBody td:empty{display:none!important}
+  #vstBody td[data-l="Vehicle Series"]{order:1!important;grid-column:1!important;font-size:15px!important;font-weight:700!important}
+  #vstBody td[data-l="Vehicle No."]{order:2!important;grid-column:2!important;font-size:18px!important;font-weight:800!important}
+  #vstBody td:not([data-l="Vehicle Series"]):not([data-l="Vehicle No."]){order:3!important;grid-column:1/-1!important}
+}
+</style>
+<style>
+/* ===== Vehicle Status: buttons on the same line as the search box; same height ===== */
+.ivBar{align-items:center!important;gap:10px!important}
+.ivBar .intInfo{order:0;margin:0!important;white-space:nowrap}
+.ivBar #vstChips{order:1;flex:1 1 auto;min-width:0;width:auto!important;max-width:none!important;padding:3px!important;gap:6px!important;border-radius:999px!important}
+.ivBar #vstChips .vstCatWrap{flex:1 1 0;min-width:0;max-width:175px}
+.ivBar #vstChips .vstCat{height:34px}
+.ivBar .intQ{order:2;flex:0 0 190px;width:190px;max-width:190px;height:34px;margin:0!important;padding:0 12px!important;font-size:13px;box-sizing:border-box}
+@media (max-width:760px){
+  .ivBar .intInfo{order:0}
+  .ivBar .intQ{order:1;flex:0 0 150px;width:150px;max-width:150px}
+  .ivBar #vstChips{order:2;flex:1 1 100%;width:100%!important}
+}
+</style>
+<style>
+/* ===== Vehicle Status: bigger buttons with full names; sub-status lists above the table ===== */
+.ivBar{position:relative;z-index:50}
+.ivBar #vstChips{z-index:50}
+.ivBar #vstChips .vstCatWrap{flex:1 1 0;min-width:0;max-width:none}
+.ivBar #vstChips .vstCat{height:46px;padding:4px 10px;font-size:12.5px;line-height:1.15;white-space:normal;text-align:center}
+.ivBar #vstChips .vstTxt{overflow:visible;text-overflow:clip;white-space:normal}
+.ivBar #vstChips .vstIc{width:22px;height:22px}
+.ivBar .intQ{height:46px}
+@media (max-width:760px){
+  .ivBar #vstChips .vstCatWrap{flex:0 0 calc(33.33% - 5px)}
+  .ivBar #vstChips .vstCat{height:44px;font-size:11.5px}
+  .ivBar .intQ{height:44px}
+}
+</style>
+<style>
+/* ===== Vehicle Status: one line of six buttons; the sub-list rolls up like a shutter when the pointer leaves ===== */
+.vstSub{clip-path:inset(-14px -20px 100% -20px round 16px);transition:clip-path .45s cubic-bezier(.22,1,.36,1),opacity .3s,transform .3s}
+.vstCatWrap:hover .vstSub,.vstCatWrap.open .vstSub{clip-path:inset(-14px -20px -20px -20px round 16px)}
+.vstCatWrap.picked .vstSub{clip-path:inset(-14px -20px 100% -20px round 16px)!important;opacity:0!important;pointer-events:none!important}
+.ivBar #vstChips{flex:1 1 auto;min-width:0}
+.ivBar #vstChips .vstCatWrap{flex:1 1 0;min-width:0}
+.ivBar #vstChips .vstCat{height:44px;padding:0 8px;gap:4px;font-size:12px;line-height:1.2;white-space:nowrap;text-align:center}
+.ivBar #vstChips .vstTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ivBar #vstChips .vstIc{width:18px;height:18px;flex:none}
+.ivBar #vstChips .vstIc svg{width:11px;height:11px}
+.ivBar .intInfo{flex:0 0 auto}
+.ivBar .intQ{flex:0 0 170px;width:170px;max-width:170px}
+@media (max-width:760px){
+  .ivBar #vstChips .vstCat{white-space:normal;line-height:1.15}
+  .ivBar #vstChips .vstTxt{white-space:normal;overflow:visible;text-overflow:clip}
+}
+</style>
+<style>
+/* ===== Vehicle Status: full names on one line; count badge sits on the corner so it does not widen the button ===== */
+.ivBar #vstChips{flex:1 1 auto;min-width:0;overflow:visible}
+.ivBar #vstChips .vstCatWrap{flex:1 1 0;min-width:150px}
+.ivBar #vstChips .vstCat{height:40px;padding:0 10px;font-size:11.5px;letter-spacing:0;white-space:nowrap;gap:0}
+.ivBar #vstChips .vstIc{display:none}
+.ivBar #vstChips .vstTxt{white-space:nowrap;overflow:visible;text-overflow:clip}
+.ivBar #vstChips .vstCat .vstCnt{position:absolute;top:-7px;right:-6px;min-width:20px;height:18px;padding:0 6px;font-size:10px;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.ivBar #vstChips .vstCat .vstCnt:empty{display:none}
+.ivBar .intQ{flex:0 0 170px;width:170px;max-width:170px;height:40px}
+.ivBar #vstChips .vstCat.on .vstCnt{background:#ffffff;color:#e11d48}
+@media (max-width:760px){
+  .ivBar #vstChips .vstCatWrap{min-width:0}
+  .ivBar #vstChips .vstCat{white-space:normal;line-height:1.15;height:44px;font-size:11.5px}
+  .ivBar #vstChips .vstTxt{white-space:normal}
+  .ivBar .intQ{height:44px}
+}
+</style>
+<style>
+/* ===== Phone: the sub-status list opens across the full width of the button bar, so nothing is cut off ===== */
+@media (max-width:760px){
+  .ivBar #vstChips .vstCatWrap{position:static}
+  .ivBar #vstChips .vstSub{left:0!important;right:0!important;width:auto!important;min-width:0!important;top:calc(100% + 8px)!important;transform:none!important}
+  .ivBar #vstChips .vstCatWrap:hover .vstSub,.ivBar #vstChips .vstCatWrap.open .vstSub{transform:none!important}
+  .ivBar #vstChips .vstCatWrap.picked .vstSub{transform:none!important}
+  .ivBar #vstChips .vstSubChip{white-space:normal}
 }
 </style>
 </head>
@@ -1503,7 +1612,7 @@ function showWelcome(p){
   letters($("wName"),p.name||"",1.5,0.06);
   letters($("wTitle"),p.title||"",1.5+(p.name||"").length*0.06+0.25,0.04);
 }
-async function enterWith(d,token){ document.body.classList.add("loggedin");$("mcard").classList.remove("signing","signed");$("pinGo").classList.remove("busy");$("pinGo").disabled=false;
+async function enterWith(d,token){ document.body.classList.add("loggedin"); setTimeout(()=>{ prefetchTemp(); prefetchVst(); },3000);$("mcard").classList.remove("signing","signed");$("pinGo").classList.remove("busy");$("pinGo").disabled=false;
   me={group:d.group||"",role:d.role||"edit",pin:token,person:d.person||{name:"",title:"",photo:""},dash:d.dash!==false,hv:!!d.hv,approver:!!d.approver};lastAct=Date.now();
   $("backMain").hidden=!me.hv;
   $("gate").hidden=true;
@@ -1990,12 +2099,41 @@ function setupSidebar(){
 var tempData = null;
 const escH = t => String(t == null ? "" : t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const stCls = s => s === "Passed" ? "s-pass" : s === "Fail" ? "s-fail" : s === "Pending" ? "s-pend" : "";
-function prefetchTemp(){
-  if(!me) return;
-  apiCall({action:"temp",pin:me.pin}).then(d=>{
-    if(d && d.ok){ tempData=d; if($("intBody")) renderInterview(); }
-  }).catch(()=>{});
+var tempAt=0, tempLoading=null, vstAt=0, vstLoading=null;
+// Loads the Interviewed data in the background (retries once on a timeout)
+function loadTemp(tries){
+  if(tempLoading) return tempLoading;
+  tries=tries||2;
+  tempLoading=apiCall({action:"temp",pin:me?me.pin:""}).then(d=>{
+      if(!d.ok) throw new Error(d.error||"failed");
+      tempData=d; tempAt=Date.now(); tempLoading=null;
+      if($("intBody")) renderInterview();
+      return d;
+  }).catch(err=>{
+      tempLoading=null;
+      if(tries>1) return new Promise(r=>setTimeout(r,1500)).then(()=>loadTemp(tries-1));
+      throw err;
+  });
+  return tempLoading;
 }
+// Loads the Vehicle Status data in the background (retries once on a timeout)
+function loadVst(tries){
+  if(vstLoading) return vstLoading;
+  tries=tries||2;
+  vstLoading=apiCall({action:"vstatus",pin:me?me.pin:""}).then(d=>{
+      if(!d.ok) throw new Error(d.error||"failed");
+      vstData=d; vstAt=Date.now(); vstLoading=null;
+      if($("vstBody")) { vstRender(); vstRefreshSubs(); vstSync(); }
+      return d;
+  }).catch(err=>{
+      vstLoading=null;
+      if(tries>1) return new Promise(r=>setTimeout(r,1500)).then(()=>loadVst(tries-1));
+      throw err;
+  });
+  return vstLoading;
+}
+function prefetchTemp(){ if(me) loadTemp().catch(()=>{}) }
+function prefetchVst(){ if(me) loadVst().catch(()=>{}) }
 function setIntMsg(t){ const m=$("intMsg"); if(m) m.textContent=t }
 function renderInterview(){
   if(!$("intBody")) return;
@@ -2014,57 +2152,120 @@ function renderInterview(){
   $("intCount").textContent=list.length+" of "+tempData.rows.length+" rows";
 }
 async function openInterviewed(){
-  openInfo('<div class="ivBar"><p class="intInfo"><span id="intCount"></span> <span id="intMsg"></span></p>'+
-    '<input id="intQ" class="intQ" type="search" placeholder="Search by bag, name, ID…" autocomplete="off"></div>'+
+  openInfo('<div class="ivBar"><p class="intInfo"><span id="intCount"></span> <span id="intMsg"></span></p><input id="intQ" class="intQ" type="search" placeholder="Search by bag, name, ID…" autocomplete="off"></div>'+
     '<div class="intWrap"><table class="intT"><thead id="intHead"></thead><tbody id="intBody"></tbody></table></div>',
     '<h2>Interviewed Driver</h2><p class="sub">Last 10 days, from the Temp File sheet</p>');
   $("infoBody").classList.add("wide");
   renderInterview();
-  try{
-    const d=await apiCall({action:"temp",pin:me?me.pin:""});
-    if(!d.ok) throw new Error(d.error||"failed");
-    tempData=d; renderInterview();
-  }catch(err){
+  if(tempData && Date.now()-tempAt<120000) return;
+  try{ await loadTemp(); }
+  catch(err){
     if(!tempData) $("intBody").innerHTML='<tr><td colspan="20">Could not load the data. '+escH(err.message)+'</td></tr>';
     else setIntMsg("Showing saved data. Refresh failed: "+err.message);
   }
 }
 // Vehicle Status: all of columns A to K from the Vehicle Status sheet (read only)
-var vstData=null, vstFilter="";
-const VST_STATUS=["Wait for Recv.Copy","Wait for Factory in","Wait for Out","On Trip","Wait for Program","Wait for Load","Denting Workshop","Wait for Workshop","Tyre Problem","Engine Workshop","Driver Leave","Driver Short","Driver Absent"];
-// a status chip matches a row when its text appears in any status column
-function vstMatch(H,r,f){
-  const f2=f.toLowerCase();
-  return H.some((h,i)=>/program\s*status|workshop|driver\s*issue|problem/i.test(String(h)) && String(r[i]||"").toLowerCase().indexOf(f2)>=0);
+var vstData=null, vstCat="", vstFilter="";
+const VST_ICONS={
+  program:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  denting:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.1-.6-.6-2.1z"/>',
+  leave:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  tyre:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>',
+  alert:'<path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/>',
+  sub:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3"/>'
+};
+// the five buttons, in the order given; each sub-list is the statuses that belong to it
+const VST_CATS=[
+  {k:"prog", label:"Program Status",      re:/program\s*status/i, icon:"program", tone:"#fbbf24",
+   subs:["Wait for Recv.Copy","Wait for Factory in","Wait for Out","On Trip","Wait for Program","Wait for Load"]},
+  {k:"work", label:"Workshop Status",     re:/workshop/i,        icon:"denting", tone:"#fb923c",
+   subs:["Denting Workshop","Wait for Workshop","Engine Workshop"]},
+  {k:"drv",  label:"Driver Issue Status", re:/driver\s*issue/i,  icon:"leave",   tone:"#60a5fa",
+   subs:["Driver Leave","Driver Short","Driver Absent"]},
+  {k:"off",  label:"Program off",         re:/program\s*off/i,   icon:"clock",   tone:"#94a3b8",
+   subs:null},                                   // no fixed list: the values found in this column
+  {k:"prob", label:"Problem Status",      re:/problem/i,         icon:"tyre",    tone:"#f87171",
+   subs:["Tyre Problem"]},
+  {k:"red",  label:"Red rows",            re:null,               icon:"alert",   tone:"#fb7185",
+   subs:[]}                                      // the rows that are marked red
+];
+function vstCatOf(k){ return VST_CATS.find(c=>c.k===k) }
+// the sub-status list of a button: fixed, or the distinct values found in its column
+function vstSubsFor(c){
+  if(c.subs) return c.subs;
+  if(!vstData) return [];
+  const i=vstData.headers.findIndex(h=>c.re.test(String(h)));
+  if(i<0) return [];
+  const set=new Set();
+  vstData.rows.forEach(r=>{ const v=String(r[i]||"").trim(); if(v) set.add(v) });
+  return [...set].sort();
 }
-function vstChipsHtml(){
-  const chip=(f,label,on)=>'<button type="button" class="vstChip'+(on?' on':'')+'" data-f="'+escH(f)+'"><span class="vstTxt">'+escH(label)+'</span><span class="vstCnt"></span></button>';
-  return '<div class="vstChips" id="vstChips"><span class="vstInd"></span>'+chip("","All",true)+
-    VST_STATUS.map(x=>chip(x,x,false)).join("")+'</div>';
+// does a row belong to a button (and, if given, to one of its sub-statuses)?
+function vstPassFor(H,r,k,f){
+  const c=vstCatOf(k); if(!c) return true;
+  if(k==="red") return vstIsRed(H,r);
+  const i=H.findIndex(h=>c.re.test(String(h)));
+  if(i<0) return false;
+  const v=String(r[i]||"").trim().toLowerCase();
+  if(!f) return v!=="";
+  return v.indexOf(f.toLowerCase())>=0;
 }
-// how many rows match a chip (all rows, not affected by the search box)
-function vstCountFor(f){
+function vstPass(H,r){ return vstPassFor(H,r,vstCat,vstFilter) }
+function subsHtml(c){
+  const list=vstSubsFor(c);
+  if(!list.length) return '<div class="vstNone">No entries</div>';
+  return list.map((x,i)=>'<button type="button" class="vstSubChip" data-cat="'+c.k+'" data-f="'+escH(x)+'" style="--i:'+i+'"><span class="vstTxt">'+escH(x)+'</span><span class="vstCnt"></span></button>').join("");
+}
+function vstCatsHtml(){
+  return '<div class="vstChips" id="vstChips"><span class="vstInd"></span>'+VST_CATS.map(c=>
+    '<div class="vstCatWrap" data-cat="'+c.k+'">'+
+      '<button type="button" class="vstCat" data-cat="'+c.k+'" style="--ic:'+c.tone+'">'+
+        '<span class="vstIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+VST_ICONS[c.icon]+'</svg></span>'+
+        '<span class="vstTxt">'+escH(c.label)+'</span><span class="vstCnt"></span></button>'+
+      (c.k==="red" ? '' : '<div class="vstSub">'+subsHtml(c)+'</div>')+'</div>').join("")+'</div>';
+}
+// rebuild the sub-lists (the "Program off" list comes from the data)
+function vstRefreshSubs(){
+  document.querySelectorAll("#vstChips .vstCatWrap").forEach(w=>{
+    const c=vstCatOf(w.dataset.cat); const box=w.querySelector(".vstSub");
+    if(c && box) box.innerHTML=subsHtml(c);
+  });
+  vstShowCount();
+}
+// how many rows a button (or sub-status) matches, all rows, not affected by the search box
+function vstCountOf(k,f){
   if(!vstData) return 0;
-  return f ? vstData.rows.filter(r=>vstMatch(vstData.headers,r,f)).length : vstData.rows.length;
+  return vstData.rows.filter(r=>vstPassFor(vstData.headers,r,k,f)).length;
 }
-// the count is shown only on the selected chip
+// the count is shown only on the selected button or sub-status
 function vstShowCount(){
   const wrap=$("vstChips"); if(!wrap) return;
-  const on=wrap.querySelector(".vstChip.on");
-  if(on && vstData) on.querySelector(".vstCnt").textContent=vstCountFor(on.dataset.f);
+  wrap.querySelectorAll(".vstCnt").forEach(x=>x.textContent="");
+  const sub=wrap.querySelector(".vstSubChip.on"), cat=wrap.querySelector(".vstCat.on");
+  if(sub && vstData) sub.querySelector(".vstCnt").textContent=vstCountOf(sub.dataset.cat, sub.dataset.f);
+  else if(cat && vstData) cat.querySelector(".vstCnt").textContent=vstCountOf(cat.dataset.cat, "");
 }
+// the sliding highlight follows the selected button (measured on screen, so wrapping is handled)
 function vstMoveInd(btn){
-  const wrap=$("vstChips"); if(!wrap||!btn) return;
+  const wrap=$("vstChips"); if(!wrap) return;
   const ind=wrap.querySelector(".vstInd");
+  if(!btn){ ind.style.width="0px"; ind.style.height="0px"; return }
+  const cw=btn.parentElement;                       // the button's wrapper is positioned inside the bar
+  const x=cw.offsetLeft+btn.offsetLeft, y=cw.offsetTop+btn.offsetTop;
+  ind.classList.remove("go"); void ind.offsetWidth; ind.classList.add("go");
   ind.style.width=btn.offsetWidth+"px";
   ind.style.height=btn.offsetHeight+"px";
-  ind.style.transform="translate("+btn.offsetLeft+"px,"+btn.offsetTop+"px)";
+  ind.style.transform="translate("+x+"px,"+y+"px)";
 }
-function vstSelect(btn){
+// marks the selected button and sub-status and moves the highlight
+function vstSync(){
   const wrap=$("vstChips"); if(!wrap) return;
-  wrap.querySelectorAll(".vstChip").forEach(b=>b.classList.toggle("on",b===btn));
+  wrap.querySelectorAll(".vstCat").forEach(b=>b.classList.toggle("on", b.dataset.cat===vstCat));
+  wrap.querySelectorAll(".vstSubChip").forEach(b=>b.classList.toggle("on", b.dataset.cat===vstCat && b.dataset.f===vstFilter && !!vstFilter));
+  const active=wrap.querySelector(".vstCat.on");
+  vstMoveInd(active);
   vstShowCount();
-  requestAnimationFrame(()=>vstMoveInd(btn));
 }
 // A row turns red when all four of these are empty, or when two or more of them have a status
 function vstIsRed(H,r){
@@ -2079,29 +2280,30 @@ function vstRender(){
   if(!vstData){ $("vstBody").innerHTML='<tr><td>Loading…</td></tr>'; return }
   const H=vstData.headers, q=($("vstQ")?$("vstQ").value:"").trim().toLowerCase();
   $("vstHead").innerHTML="<tr>"+H.map(h=>"<th>"+escH(h)+"</th>").join("")+"</tr>";
-  const list=vstData.rows.filter(r=>(!vstFilter||vstMatch(H,r,vstFilter))&&(!q||r.join(" ").toLowerCase().indexOf(q)>=0));
-  $("vstBody").innerHTML = list.map(r=>'<tr class="'+(vstIsRed(H,r)?"vred":"")+'">'+r.map((v,k)=>'<td data-l="'+escH(H[k]||"")+'">'+escH(v)+"</td>").join("")+"</tr>").join("")
+  const list=vstData.rows.filter(r=>vstPass(H,r)&&(!q||r.join(" ").toLowerCase().indexOf(q)>=0));
+  $("vstBody").innerHTML = list.map(r=>'<tr class="'+(vstIsRed(H,r)?"vred":"")+'">'+r.map((v,k)=>'<td data-l="'+escH(H[k]||"")+'"'+(String(v).trim()===""?' class="vempty"':'')+'>'+escH(v)+"</td>").join("")+"</tr>").join("")
     || '<tr><td colspan="'+Math.max(H.length,1)+'">No matching rows</td></tr>';
   $("vstCount").textContent=list.length+" of "+vstData.rows.length+" rows";
   vstShowCount();
 }
 async function openVehicleStatus(){
   openInfo('<div class="ivBar"><p class="intInfo"><span id="vstCount"></span> <span id="vstMsg"></span></p>'+
+    '<div id="vstSlot"></div>'+
     '<input id="vstQ" class="intQ" type="search" placeholder="Search…" autocomplete="off"></div>'+
     '<div class="intWrap"><table class="intT"><thead id="vstHead"></thead><tbody id="vstBody"></tbody></table></div>',
     '<h2>Vehicle Status</h2>');
-  $("ipExtra").innerHTML=vstChipsHtml();
-  vstFilter="";
-  requestAnimationFrame(()=>vstMoveInd($("vstChips").querySelector(".vstChip.on")));
+  $("vstSlot").innerHTML=vstCatsHtml();
+  $("infoBody").querySelectorAll(".vstCatWrap").forEach(w=>w.addEventListener("pointerleave",()=>w.classList.remove("picked")));
+  vstCat=""; vstFilter="";
+  vstRefreshSubs();
+  requestAnimationFrame(()=>vstSync());
   $("infoBody").classList.add("wide");
   vstRender();
-  try{
-    const d=await apiCall({action:"vstatus",pin:me?me.pin:""});
-    if(!d.ok) throw new Error(d.error||"failed");
-    vstData=d; vstRender();
-  }catch(err){
+  if(vstData && Date.now()-vstAt<120000) return;
+  try{ await loadVst(); }
+  catch(err){
     if(!vstData) $("vstBody").innerHTML='<tr><td colspan="11">Could not load the data. '+escH(err.message)+'</td></tr>';
-    else setIntMsg("Refresh failed: "+err.message);
+    else setIntMsg("Showing saved data. Refresh failed: "+err.message);
   }
 }
 async function saveStatus(sel){
@@ -2158,8 +2360,31 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("infoOv").onclick=e=>{if(e.target.id==="infoOv")closeInfo()};
   setupSidebar();
   $("infoBody").addEventListener("input",e=>{if(e.target.id==="intQ")renderInterview();if(e.target.id==="vstQ")vstRender()});
-  $("ipExtra").addEventListener("click",e=>{const b=e.target.closest(".vstChip"); if(!b) return; vstFilter=b.dataset.f||""; vstSelect(b); vstRender()});
-  window.addEventListener("resize",()=>{const on=$("vstChips")&&$("vstChips").querySelector(".vstChip.on"); if(on) vstMoveInd(on)});
+  $("infoBody").addEventListener("click",e=>{
+    const sub=e.target.closest(".vstSubChip"), cat=e.target.closest(".vstCat");
+    const touch=matchMedia("(hover: none)").matches;
+    if(sub){
+      const k=sub.dataset.cat, f=sub.dataset.f;
+      if(vstCat===k && vstFilter===f){ vstFilter=""; } else { vstCat=k; vstFilter=f; }
+      const pw=sub.closest(".vstCatWrap"); pw.classList.remove("open"); pw.classList.add("picked");
+    } else if(cat){
+      const k=cat.dataset.cat;
+      if(vstCat===k){ vstCat=""; vstFilter=""; } else { vstCat=k; vstFilter=""; }
+      cat.closest(".vstCatWrap").classList.remove("picked");
+      if(touch){ const w=cat.closest(".vstCatWrap"); const was=w.classList.contains("open");
+        document.querySelectorAll("#vstChips .vstCatWrap.open").forEach(x=>x.classList.remove("open"));
+        if(!was) w.classList.add("open"); }
+    } else return;
+    if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    vstSync(); vstRender();
+  });
+  window.addEventListener("resize",()=>vstSync());
+  $("infoBody").addEventListener("pointerout",e=>{
+    const w=e.target.closest&&e.target.closest(".vstCatWrap");
+    if(w && !(e.relatedTarget && w.contains(e.relatedTarget))) w.classList.remove("picked");
+  });
+  // a pick closes the list; it opens again only after the pointer has left the button
+  $("infoBody").addEventListener("pointerleave",e=>{ const w=e.target; if(w.classList&&w.classList.contains("vstCatWrap")) w.classList.remove("picked") },true);
   $("infoBody").addEventListener("change",e=>{if(e.target.classList&&e.target.classList.contains("stsel"))saveStatus(e.target)});
   $("eHv").onclick=openHV;
   $("eDash").onclick=()=>{$("entry").hidden=true;document.body.classList.remove("menufirst")};
